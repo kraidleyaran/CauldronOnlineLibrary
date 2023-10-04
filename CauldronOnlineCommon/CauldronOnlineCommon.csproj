@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{868DFBEF-B022-457F-9E0F-28829CF8DEB9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CauldronOnlineCommon</RootNamespace>
+    <AssemblyName>CauldronOnlineCommon</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FileDataLib">
+      <HintPath>..\External Libraries\FileDataLib.dll</HintPath>
+    </Reference>
+    <Reference Include="MessageBusLib">
+      <HintPath>..\External Libraries\MessageBusLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Telepathy, Version=1.0.341.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Telepathy.1.0.341\lib\net471\Telepathy.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CauldronUtils.cs" />
+    <Compile Include="ClientMessages.cs" />
+    <Compile Include="Data\ClientCharacterData.cs" />
+    <Compile Include="Data\ClientObjectData.cs" />
+    <Compile Include="Data\Combat\AbilitySight.cs" />
+    <Compile Include="Data\Combat\AiAbilityData.cs" />
+    <Compile Include="Data\Combat\ApplyHitboxData.cs" />
+    <Compile Include="Data\Combat\CombatSettings.cs" />
+    <Compile Include="Data\Combat\CombatStats.cs" />
+    <Compile Include="Data\Combat\CombatVitals.cs" />
+    <Compile Include="Data\Combat\DamageType.cs" />
+    <Compile Include="Data\Combat\HitboxData.cs" />
+    <Compile Include="Data\Combat\SecondaryStats.cs" />
+    <Compile Include="Data\Items\WorldItemStackData.cs" />
+    <Compile Include="Data\Items\LootRollData.cs" />
+    <Compile Include="Data\Items\LootTableData.cs" />
+    <Compile Include="Data\Items\ShopItemData.cs" />
+    <Compile Include="Data\Math\WorldIntRange.cs" />
+    <Compile Include="Data\Math\WorldVector2Int.cs" />
+    <Compile Include="Data\ObjectParameters\ObjectParameter.cs" />
+    <Compile Include="Data\OnSwitchSignalData.cs" />
+    <Compile Include="Data\Traits\AiAbilityManagerTraitData.cs" />
+    <Compile Include="Data\Traits\AiAggroTraitData.cs" />
+    <Compile Include="Data\Traits\AiMovementTraitData.cs" />
+    <Compile Include="Data\Traits\AiStateTraitData.cs" />
+    <Compile Include="Data\Traits\AiWanderTraitData.cs" />
+    <Compile Include="Data\Traits\ApplyMovementSpeedTraitData.cs" />
+    <Compile Include="Data\Traits\CombatStatsTraitData.cs" />
+    <Compile Include="Data\Traits\DialogueTraitData.cs" />
+    <Compile Include="Data\Traits\DoorTraitData.cs" />
+    <Compile Include="Data\Traits\GroupSpawnerTraitData.cs" />
+    <Compile Include="Data\Traits\HitboxTraitData.cs" />
+    <Compile Include="Data\Traits\HurtboxTraitData.cs" />
+    <Compile Include="Data\Traits\LootChestTraitData.cs" />
+    <Compile Include="Data\Traits\LootTraitData.cs" />
+    <Compile Include="Data\Traits\MonsterExperienceTraitData.cs" />
+    <Compile Include="Data\Traits\ObjectSpawnerTraitData.cs" />
+    <Compile Include="Data\Traits\SetDoorStateTraitData.cs" />
+    <Compile Include="Data\Traits\ShopTraitData.cs" />
+    <Compile Include="Data\Traits\SpriteTraitData.cs" />
+    <Compile Include="Data\Traits\SwitchSignalReceiverTraitData.cs" />
+    <Compile Include="Data\Traits\TerrainTraitData.cs" />
+    <Compile Include="Data\Traits\TriggerEventReceiverTraitData.cs" />
+    <Compile Include="Data\Traits\WorldTraitData.cs" />
+    <Compile Include="Data\TriggerEvents\TriggerEventData.cs" />
+    <Compile Include="Data\WorldEvent.cs" />
+    <Compile Include="Data\WorldTick.cs" />
+    <Compile Include="Data\Zones\ObjectSpawnData.cs" />
+    <Compile Include="Data\Zones\WorldZoneData.cs" />
+    <Compile Include="Data\Zones\ZoneSpawnData.cs" />
+    <Compile Include="Data\Zones\ZoneTileData.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WorldClient.cs" />
+    <Compile Include="WorldClientState.cs" />
+    <Compile Include="WorldStack.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"C:\CauldronOnlineServer\copy libraries to client.bat"</PostBuildEvent>
+  </PropertyGroup>
+</Project>
