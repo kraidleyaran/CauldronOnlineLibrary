@@ -185,6 +185,7 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public WorldIntRange Drops { get; set; }
         public string OpenSprite { get; set; }
         public string ClosedSprite { get; set; }
+        public HitboxData Hitbox { get; set; }
     }
 
 }

@@ -9,7 +9,7 @@ using CauldronOnlineCommon.Data.ObjectParameters;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Requests;
 using CauldronOnlineServer.Services.Traits;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Zones.Managers
 {

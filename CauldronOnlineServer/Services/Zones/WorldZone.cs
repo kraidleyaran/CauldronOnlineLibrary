@@ -7,7 +7,7 @@ using CauldronOnlineCommon.Data.Math;
 using CauldronOnlineCommon.Data.Zones;
 using CauldronOnlineServer.Interfaces;
 using CauldronOnlineServer.Services.Zones.Managers;
-using MessageBusLib;
+using ConcurrentMessageBus;
 using RogueSharp;
 
 namespace CauldronOnlineServer.Services.Zones

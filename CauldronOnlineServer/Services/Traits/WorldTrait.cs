@@ -2,7 +2,7 @@
 using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineServer.Interfaces;
 using CauldronOnlineServer.Services.Zones;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Traits
 {

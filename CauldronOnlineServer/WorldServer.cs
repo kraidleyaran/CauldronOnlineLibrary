@@ -16,7 +16,7 @@ using CauldronOnlineServer.Services.Items;
 using CauldronOnlineServer.Services.Traits;
 using CauldronOnlineServer.Services.TriggerEvents;
 using CauldronOnlineServer.Services.Zones;
-using MessageBusLib;
+using ConcurrentMessageBus;
 using Telepathy;
 
 namespace CauldronOnlineServer

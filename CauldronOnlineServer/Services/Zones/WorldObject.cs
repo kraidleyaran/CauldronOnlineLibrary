@@ -6,7 +6,7 @@ using CauldronOnlineCommon.Data.Math;
 using CauldronOnlineCommon.Data.ObjectParameters;
 using CauldronOnlineServer.Interfaces;
 using CauldronOnlineServer.Services.Traits;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Zones
 {

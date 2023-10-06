@@ -1,4 +1,5 @@
 ﻿using System;
+using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.Math;
 
 namespace CauldronOnlineCommon.Data.Traits
@@ -13,5 +14,6 @@ namespace CauldronOnlineCommon.Data.Traits
         public WorldIntRange Drops;
         public string OpenSprite;
         public string ClosedSprite;
+        public HitboxData Hitbox;
     }
 }

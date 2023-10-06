@@ -26,6 +26,7 @@ namespace CauldronOnlineServer.Services.Traits
                 _parameter.Open = false;
                 _parameter.OpenSprite = lootData.OpenSprite;
                 _parameter.ClosedSprite = lootData.ClosedSprite;
+                _parameter.Hitbox = lootData.Hitbox;
             }
         }
 

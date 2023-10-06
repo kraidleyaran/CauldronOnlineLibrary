@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using CauldronOnlineCommon;
 using CauldronOnlineCommon.Data;
 using CauldronOnlineCommon.Data.WorldEvents;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Zones.Managers
 {

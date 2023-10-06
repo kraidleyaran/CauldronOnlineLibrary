@@ -1,7 +1,7 @@
 ﻿using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineServer.Services.TriggerEvents;
 using CauldronOnlineServer.Services.Zones;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Traits
 {

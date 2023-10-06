@@ -1,6 +1,6 @@
 ﻿using System;
 using CauldronOnlineServer.Interfaces;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Zones.Managers
 {

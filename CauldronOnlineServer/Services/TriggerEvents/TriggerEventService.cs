@@ -6,7 +6,7 @@ using CauldronOnlineCommon.Data;
 using CauldronOnlineCommon.Data.TriggerEvents;
 using CauldronOnlineServer.Logging;
 using FileDataLib;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.TriggerEvents
 {

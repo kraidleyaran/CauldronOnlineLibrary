@@ -5,7 +5,7 @@ using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.Zones;
 using CauldronOnlineServer.Services.Zones;
 using CauldronOnlineServer.Services.Zones.Managers;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Traits
 {
@@ -17,6 +17,7 @@ namespace CauldronOnlineServer.Services.Traits
         private float _chanceToSpawn = 1f;
         private float _bonusChanceToSpawn = 0f;
         private float _bonusPerMissedChance = 0f;
+        private bool _initialSpawn = false;
 
         private TickTimer _spawnTimer = null;
 
@@ -36,6 +37,7 @@ namespace CauldronOnlineServer.Services.Traits
                 _spawnData = spawnerData.SpawnData;
                 _chanceToSpawn = spawnerData.ChanceToSpawn;
                 _bonusPerMissedChance = spawnerData.BonusPerMissedChance;
+                _initialSpawn = spawnerData.InitialSpawn;
             }
         }
 
@@ -46,6 +48,12 @@ namespace CauldronOnlineServer.Services.Traits
             if (zone != null)
             {
                 _spawnableTiles = zone.GetTilesInSquareArea(_parent.Tile, _spawnArea);
+            }
+
+            if (_initialSpawn)
+            {
+                _bonusChanceToSpawn = 100f;
+                SpawnUnit();
             }
             SubscribeToMessages();
         }

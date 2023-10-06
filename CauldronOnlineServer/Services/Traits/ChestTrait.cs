@@ -1,5 +1,6 @@
 ﻿using CauldronOnlineCommon.Data.Traits;
-using MessageBusLib;
+using CauldronOnlineServer.Services.Zones;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Traits
 {
@@ -26,7 +27,11 @@ namespace CauldronOnlineServer.Services.Traits
             return _open;
         }
 
-        
+        public override void Setup(WorldObject parent, object sender)
+        {
+            base.Setup(parent, sender);
+            SubscribeToMessages();
+        }
 
         protected internal void SubscribeToMessages()
         {

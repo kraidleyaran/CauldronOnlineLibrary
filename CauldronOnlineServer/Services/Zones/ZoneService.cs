@@ -6,7 +6,7 @@ using System.Threading;
 using CauldronOnlineCommon.Data.Zones;
 using CauldronOnlineServer.Logging;
 using FileDataLib;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Zones
 {

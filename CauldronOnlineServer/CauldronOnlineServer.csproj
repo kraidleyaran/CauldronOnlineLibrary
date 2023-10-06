@@ -31,12 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ConcurrentMessageBus">
+      <HintPath>..\External Libraries\ConcurrentMessageBus.dll</HintPath>
+    </Reference>
     <Reference Include="FileDataLib">
       <HintPath>..\..\CauldronBoardServer\External Libraries\FileDataLib.dll</HintPath>
-    </Reference>
-    <Reference Include="MessageBusLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\External Libraries\MessageBusLib.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -81,6 +80,7 @@
     <Compile Include="Services\Traits\AiStateTrait.cs" />
     <Compile Include="Services\Traits\AiWanderTrait.cs" />
     <Compile Include="Services\Traits\ApplyMovementSpeedTrait.cs" />
+    <Compile Include="Services\Traits\ChargeTrait.cs" />
     <Compile Include="Services\Traits\ChestTrait.cs" />
     <Compile Include="Services\Traits\CombatStatsTrait.cs" />
     <Compile Include="Services\Traits\DialogueTrait.cs" />
@@ -101,6 +101,7 @@
     <Compile Include="Services\Traits\SwitchSignalReceiverTrait.cs" />
     <Compile Include="Services\Traits\SwitchTrait.cs" />
     <Compile Include="Services\Traits\TerrainTrait.cs" />
+    <Compile Include="Services\Traits\TimerTrait.cs" />
     <Compile Include="Services\Traits\TraitService.cs" />
     <Compile Include="Services\Traits\TriggerEventHitboxTrait.cs" />
     <Compile Include="Services\Traits\TriggerEventReceiverTrait.cs" />

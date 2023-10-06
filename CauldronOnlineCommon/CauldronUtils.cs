@@ -91,7 +91,6 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<ClientDoorCheckMessage>(json, _settings);
                 case ClientOpenChestMessage.ID:
                     return JsonConvert.DeserializeObject<ClientOpenChestMessage>(json, _settings);
-
             }
         }
 
@@ -135,6 +134,8 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<SwitchSignalEvent>(json, _settings);
                 case DoorCheckEvent.ID:
                     return JsonConvert.DeserializeObject<DoorCheckEvent>(json, _settings);
+                case ChestEvent.ID:
+                    return JsonConvert.DeserializeObject<ChestEvent>(json, _settings);
                 default:
                     return original;
             }

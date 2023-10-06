@@ -8,7 +8,7 @@ using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Services.Zones;
 using CauldronOnlineServer.Services.Zones.Managers;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Traits
 {
@@ -38,6 +38,17 @@ namespace CauldronOnlineServer.Services.Traits
 
         private void OnAbilityTimerFinished(AiAbilityData ability)
         {
+            if (ability.ApplyAfterCast.Length > 0)
+            {
+                var traits = TraitService.GetWorldTraits(ability.ApplyAfterCast);
+                if (traits.Length > 0)
+                {
+                    foreach (var trait in traits)
+                    {
+                        _parent.AddTrait(trait);
+                    }
+                }
+            }
             if (_parent.State == WorldObjectState.Attacking)
             {
                 _parent.SetObjectState(WorldObjectState.Active);
@@ -122,6 +133,7 @@ namespace CauldronOnlineServer.Services.Traits
                     {
                         ids[i] = $"{_parent.Data.Id}-{Guid.NewGuid().ToString()}";
                     }
+                    this.SendMessageTo(new SetFaceDirectionMessage{Direction = msg.Direction}, _parent);
                     zone.EventManager.RegisterEvent(new AbilityEvent { OwnerId = _parent.Data.Id, TargetId = msg.Target.Data.Id, Direction = msg.Direction, Ability = ability.Ability, Position = _parent.Data.Position, Ids = ids });
 
                     _castingTimer = new TickTimer(ability.Length, 0, _parent.ZoneId);

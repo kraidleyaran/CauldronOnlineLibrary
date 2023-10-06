@@ -6,7 +6,7 @@ using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Services.Zones;
 using CauldronOnlineServer.Services.Zones.Managers;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Traits
 {
@@ -18,6 +18,8 @@ namespace CauldronOnlineServer.Services.Traits
         private List<ZoneTile> _currentPath = new List<ZoneTile>();
 
         private bool _knockbackActive = false;
+
+        private WorldVector2Int _direction = WorldVector2Int.Zero;
 
         //private ObjectPathParameter _pathParameter = new ObjectPathParameter();
 
@@ -45,11 +47,14 @@ namespace CauldronOnlineServer.Services.Traits
             _parent.SubscribeWithFilter<ApplyKnockbackMessage>(ApplyKnockback, _id);
             _parent.SubscribeWithFilter<KnockbackFinishedMessage>(KnockbackFinished, _id);
             _parent.SubscribeWithFilter<ApplyMovementSpeedMessage>(ApplyMovementSpeed, _id);
+            _parent.SubscribeWithFilter<QueryFaceDirectionMessage>(QueryFaceDirection, _id);
+            _parent.SubscribeWithFilter<SetFaceDirectionMessage>(SetFaceDirection, _id);
         }
 
         private void SetCurrentPath(SetCurrentPathMessage msg)
         {
             _currentPath = msg.Path.ToList();
+            _direction = _currentPath[0].Position - _parent.Tile.Position;
             //var path = _currentPath.Select(t => t.WorldPosition).ToArray();
             //var zone = ZoneService.GetZoneById(_parent.ZoneId);
             //zone?.EventManager.RegisterEvent(new UpdatePathEvent{Path = path, OwnerId = _parent.Data.Id, Speed = _moveSpeed});
@@ -148,6 +153,16 @@ namespace CauldronOnlineServer.Services.Traits
             {
                 _moveSpeed += msg.Speed;
             }
+        }
+
+        private void SetFaceDirection(SetFaceDirectionMessage msg)
+        {
+            _direction = msg.Direction;
+        }
+
+        private void QueryFaceDirection(QueryFaceDirectionMessage msg)
+        {
+            msg.DoAfter.Invoke(_direction);
         }
     }
 }

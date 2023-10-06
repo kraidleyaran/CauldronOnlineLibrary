@@ -15,5 +15,6 @@ namespace CauldronOnlineCommon.Data.Traits
         public int MaxSpawns = 1;
         public float ChanceToSpawn = 1f;
         public float BonusPerMissedChance = 0f;
+        public bool InitialSpawn = false;
     }
 }

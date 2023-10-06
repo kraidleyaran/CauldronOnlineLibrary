@@ -31,11 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ConcurrentMessageBus">
+      <HintPath>..\External Libraries\ConcurrentMessageBus.dll</HintPath>
+    </Reference>
     <Reference Include="FileDataLib">
       <HintPath>..\External Libraries\FileDataLib.dll</HintPath>
-    </Reference>
-    <Reference Include="MessageBusLib">
-      <HintPath>..\External Libraries\MessageBusLib.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -80,6 +80,7 @@
     <Compile Include="Data\Traits\AiStateTraitData.cs" />
     <Compile Include="Data\Traits\AiWanderTraitData.cs" />
     <Compile Include="Data\Traits\ApplyMovementSpeedTraitData.cs" />
+    <Compile Include="Data\Traits\ChargeTraitData.cs" />
     <Compile Include="Data\Traits\CombatStatsTraitData.cs" />
     <Compile Include="Data\Traits\DialogueTraitData.cs" />
     <Compile Include="Data\Traits\DoorTraitData.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Data\Traits\SpriteTraitData.cs" />
     <Compile Include="Data\Traits\SwitchSignalReceiverTraitData.cs" />
     <Compile Include="Data\Traits\TerrainTraitData.cs" />
+    <Compile Include="Data\Traits\TimerTraitData.cs" />
     <Compile Include="Data\Traits\TriggerEventReceiverTraitData.cs" />
     <Compile Include="Data\Traits\WorldTraitData.cs" />
     <Compile Include="Data\TriggerEvents\TriggerEventData.cs" />

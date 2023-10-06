@@ -4,7 +4,7 @@ using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.Items;
 using CauldronOnlineCommon.Data.Math;
 using CauldronOnlineCommon.Data.WorldEvents;
-using MessageBusLib;
+using ConcurrentMessageBus;
 using Newtonsoft.Json;
 
 namespace CauldronOnlineCommon

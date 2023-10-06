@@ -7,7 +7,7 @@ using CauldronOnlineCommon.Data.Math;
 using CauldronOnlineServer.Requests;
 using CauldronOnlineServer.Services.Traits;
 using CauldronOnlineServer.Services.Zones;
-using MessageBusLib;
+using ConcurrentMessageBus;
 using Newtonsoft.Json.Serialization;
 
 namespace CauldronOnlineServer
@@ -212,4 +212,13 @@ namespace CauldronOnlineServer
         public static OpenChestMessage INSTANCE = new OpenChestMessage();
     }
 
+    public class SetFaceDirectionMessage : EventMessage
+    {
+        public WorldVector2Int Direction;
+    }
+
+    public class QueryFaceDirectionMessage : EventMessage
+    {
+        public Action<WorldVector2Int> DoAfter;
+    }
 }

@@ -102,6 +102,10 @@ namespace CauldronOnlineServer.Services.Traits
                     return new GroupSpawnerTrait(data);
                 case LootChestTraitData.TYPE:
                     return new LootChestTrait(data);
+                case TimerTraitData.TYPE:
+                    return new TimerTrait(data);
+                case ChargeTraitData.TYPE:
+                    return new ChargeTrait(data);
                 default:
                     return new WorldTrait(data);
             }

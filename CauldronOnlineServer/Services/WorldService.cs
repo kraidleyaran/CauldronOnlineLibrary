@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using CauldronOnlineServer.Interfaces;
 using CauldronOnlineServer.Logging;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services
 {

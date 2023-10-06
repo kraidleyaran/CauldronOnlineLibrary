@@ -3,7 +3,7 @@ using CauldronOnlineCommon.Data.Math;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Services.Zones;
 using CauldronOnlineServer.Services.Zones.Managers;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Traits
 {

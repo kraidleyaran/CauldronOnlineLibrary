@@ -7,7 +7,7 @@ using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineServer.Requests;
 using CauldronOnlineServer.Services.Combat;
 using CauldronOnlineServer.Services.Zones;
-using MessageBusLib;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Traits
 {
