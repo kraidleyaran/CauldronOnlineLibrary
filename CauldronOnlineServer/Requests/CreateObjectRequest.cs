@@ -15,8 +15,10 @@ namespace CauldronOnlineServer.Requests
         public bool IsMonster;
         public Action<WorldObject> DoAfter;
         public ObjectParameter[] Parameters;
+        public bool ShowName;
+        public bool ShowAppearance;
 
-        public CreateObjectRequest(string displayName, string[] traits, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient)
+        public CreateObjectRequest(string displayName, string[] traits, bool showName, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient, bool showAppearance)
         {
             DisplayName = displayName;
             Traits = traits;
@@ -25,6 +27,8 @@ namespace CauldronOnlineServer.Requests
             ShowOnClient = showOnClient;
             DoAfter = doAfter;
             IsMonster = isMonster;
+            ShowName = showName;
+            ShowAppearance = showAppearance;
         }
     }
 }

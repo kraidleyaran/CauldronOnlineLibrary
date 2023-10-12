@@ -13,5 +13,6 @@ namespace CauldronOnlineCommon.Data
         public WorldVector2Int Position;
         public byte[][] Parameters = new byte[0][];
         public bool IsMonster = false;
+        public bool ShowName = false;
     }
 }

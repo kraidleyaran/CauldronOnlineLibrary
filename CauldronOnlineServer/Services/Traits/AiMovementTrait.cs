@@ -73,10 +73,23 @@ namespace CauldronOnlineServer.Services.Traits
                 {
                     var moveToPos = _parent.Data.Position + _parent.Data.Position.Direction(moveTo.WorldPosition) * moveSpeed;
                     var zone = ZoneService.GetZoneById(_parent.ZoneId);
-                    if (zone != null && zone.IsValidPosition(moveToPos))
+                    if (zone != null)
                     {
                         _parent.SetPosition(moveToPos);
-                        zone.EventManager.RegisterEvent(new MovementEvent { Id = _parent.Data.Id, Position = moveToPos, Speed = moveSpeed });
+                        if (zone.IsValidPosition(moveToPos))
+                        {
+                            zone.EventManager.RegisterEvent(new MovementEvent { Id = _parent.Data.Id, Position = moveToPos, Speed = moveSpeed });
+                        }
+                        else
+                        {
+                            var tile = zone.FindClosestTile(_parent.Tile, moveToPos);
+                            if (tile != null)
+                            {
+                                _currentPath.Clear();
+                                _parent.Tile = tile;
+                                this.SendMessageTo(ZoneTileUpdatedMessage.INSTANCE, _parent);
+                            }
+                        }
                     }
                 }
                 else

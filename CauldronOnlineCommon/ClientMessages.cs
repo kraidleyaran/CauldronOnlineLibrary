@@ -238,6 +238,7 @@ namespace CauldronOnlineCommon
         public ClientCharacterData Data { get; set; }
         public string Zone { get; set; }
         public WorldVector2Int Position { get; set; }
+        public WorldTick Tick { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptOut)]
@@ -356,6 +357,16 @@ namespace CauldronOnlineCommon
         public const int ID = 32;
         public override int MessageId => ID;
         public string TargetId { get; set; }
+        public WorldTick Tick { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientTeleportMessage : ClientMessage
+    {
+        public const int ID = 33;
+        public override int MessageId => ID;
+        public WorldVector2Int Position { get; set; }
         public WorldTick Tick { get; set; }
     }
 

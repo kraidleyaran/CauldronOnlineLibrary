@@ -94,6 +94,7 @@ namespace CauldronOnlineServer.Services.Traits
             this.SubscribeWithFilter<ClientAddKeyItemMessage>(ClientAddKeyItem, _worldId);
             this.SubscribeWithFilter<ClientDoorCheckMessage>(ClientDoorCheck, _worldId);
             this.SubscribeWithFilter<ClientOpenChestMessage>(ClientOpenChest, _worldId);
+            this.SubscribeWithFilter<ClientTeleportMessage>(ClientTeleport, _worldId);
             
             _parent.SubscribeWithFilter<ApplyExperienceMessage>(ApplyExperience, _id);
         }
@@ -112,7 +113,12 @@ namespace CauldronOnlineServer.Services.Traits
             if (zone != null)
             {
                 var objs = zone.ObjectManager.GetObjectData();
-                WorldServer.SendToClient(new ClientObjectResultMessage{Data = objs, Success = true}, _connectionId);
+                var multiParts = new ClientObjectResultMessage {Data = objs, Success = true}.ToByteArray().ToMultiPart(CauldronUtils.MAX_MESSAGE_SIZE, ClientObjectResultMessage.ID);
+                foreach (var part in multiParts)
+                {
+                    WorldServer.SendToClient(part, _connectionId);
+                }
+                
             }
             else
             {
@@ -247,9 +253,21 @@ namespace CauldronOnlineServer.Services.Traits
             if (_parent.State != WorldObjectState.Transferring)
             {
                 var zone = ZoneService.GetZoneByName(msg.Zone);
-                if (zone != null && zone.Id != _parent.ZoneId)
+                if (zone != null)
                 {
-                    zone.ObjectManager.RequestPlayerObject(msg.Data, msg.Position, _connectionId, _worldId, OnZoneTransferComplete);
+                    if (zone.Id != _parent.ZoneId)
+                    {
+                        zone.ObjectManager.RequestPlayerObject(msg.Data, msg.Position, _connectionId, _worldId, OnZoneTransferComplete);
+                    }
+                    else if (zone.IsValidPosition(msg.Position))
+                    {
+                        zone.EventManager.RegisterEvent(new TeleportEvent{Position = msg.Position, Tick = msg.Tick, ObjectId = _parent.Data.Id}, true);
+                        WorldServer.SendToClient(new ClientZoneTransferResultMessage { Success = true, Zone = zone.Name, Position = msg.Position, ObjectId = _parent.Data.Id}, _connectionId);
+                    }
+                    else
+                    {
+                        WorldServer.SendToClient(new ClientZoneTransferResultMessage { Success = false, Message = "Invalid Position" }, _connectionId);
+                    }
                 }
                 else
                 {
@@ -347,7 +365,7 @@ namespace CauldronOnlineServer.Services.Traits
             var zone = ZoneService.GetZoneById(_parent.ZoneId);
             if (zone != null)
             {
-                zone.EventManager.RegisterEvent(new ChestEvent{TargetId = msg.TargetId, Tick = msg.Tick}, true);
+                zone.EventManager.RegisterEvent(new ChestOpenEvent{TargetId = msg.TargetId, Tick = msg.Tick}, true);
             }
         }
 
@@ -357,6 +375,15 @@ namespace CauldronOnlineServer.Services.Traits
             if (zone != null)
             {
                 zone.EventManager.RegisterEvent(new DoorCheckEvent{TargetId = msg.TargetId,Tick = msg.Tick}, true);
+            }
+        }
+
+        private void ClientTeleport(ClientTeleportMessage msg)
+        {
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null && zone.IsValidPosition(msg.Position))
+            {
+                zone.EventManager.RegisterEvent(new TeleportEvent{ObjectId = _parent.Data.Id, Position = msg.Position, Tick = msg.Tick});
             }
         }
 

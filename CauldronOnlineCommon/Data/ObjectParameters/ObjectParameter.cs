@@ -2,6 +2,7 @@
 using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.Items;
 using CauldronOnlineCommon.Data.Math;
+using CauldronOnlineCommon.Data.Quests;
 using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.Zones;
 using Newtonsoft.Json;
@@ -186,6 +187,39 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public string OpenSprite { get; set; }
         public string ClosedSprite { get; set; }
         public HitboxData Hitbox { get; set; }
+        public bool RefillChest { get; set; }
+        public WorldIntRange RefillTicks { get; set; }
+        public bool DestroyAfterOpen { get; set; }
+        public int DestroyTicks { get; set; }
     }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class KeyItemChestParameter : ObjectParameter
+    {
+        public const string TYPE = "KeyItemChest";
+        public override string Type => TYPE;
+        public bool Open { get; set; }
+        public WorldItemStackData Item { get; set; }
+        public string OpenSprite { get; set; }
+        public string ClosedSprite { get; set; }
+        public HitboxData Hitbox { get; set; }
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class ZoneQuestParameter : ObjectParameter
+    {
+        public const string TYPE = "ZoneQuest";
+        public override string Type => TYPE;
+        public string Name { get; set; }
+        public QuestObjectiveData[] Objectives { get; set; }
+        public int Range { get; set; }
+        public string[] ApplyOnComplete { get; set; }
+        public string[] TriggerEventOnComplete { get; set; }
+        public WorldIntRange ResetTicks { get; set; }
+    }
+
+
 
 }

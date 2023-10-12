@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.Math;
 
@@ -15,5 +16,10 @@ namespace CauldronOnlineCommon.Data.Traits
         public string OpenSprite;
         public string ClosedSprite;
         public HitboxData Hitbox;
+        public bool RefillChest;
+        public WorldIntRange RefillTicks;
+        public bool DestroyAfterOpen;
+        public int DestroyTicks;
+
     }
 }

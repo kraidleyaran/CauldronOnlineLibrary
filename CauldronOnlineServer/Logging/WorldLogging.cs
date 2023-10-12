@@ -31,9 +31,9 @@ namespace CauldronOnlineServer.Logging
         private DateTime _fileStamp = DateTime.MinValue;
         private string _logFolderPath = string.Empty;
 
-        public WorldLogging(string baseDataFolder)
+        public WorldLogging(string path)
         {
-            _logFolderPath = $"{baseDataFolder}{Path.DirectorySeparatorChar}{LOG_DIRECTORY}";
+            _logFolderPath = $"{path}";
             if (!Directory.Exists(_logFolderPath))
             {
                 Directory.CreateDirectory(_logFolderPath);

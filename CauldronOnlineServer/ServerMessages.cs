@@ -5,6 +5,7 @@ using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.Items;
 using CauldronOnlineCommon.Data.Math;
 using CauldronOnlineServer.Requests;
+using CauldronOnlineServer.Services.Quests;
 using CauldronOnlineServer.Services.Traits;
 using CauldronOnlineServer.Services.Zones;
 using ConcurrentMessageBus;
@@ -220,5 +221,11 @@ namespace CauldronOnlineServer
     public class QueryFaceDirectionMessage : EventMessage
     {
         public Action<WorldVector2Int> DoAfter;
+    }
+
+    public class ApplyObjectiveItemCompletetionMessage : EventMessage
+    {
+        public QuestObjective Objective;
+        public int Count;
     }
 }

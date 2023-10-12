@@ -74,7 +74,7 @@ namespace CauldronOnlineServer.Services.Traits
                         if (tile != null)
                         {
                             var objSpawn = zoneSpawn.Spawn;
-                            zone.ObjectManager.RequestObject(objSpawn.DisplayName, objSpawn.Traits, objSpawn.Parameters, tile.WorldPosition, objSpawn.IsMonster, UnitSpawned, objSpawn.ShowOnClient, true);
+                            zone.ObjectManager.RequestObject(objSpawn.DisplayName, objSpawn.Traits, objSpawn.ShowOnClient, objSpawn.Parameters, tile.WorldPosition, objSpawn.IsMonster, UnitSpawned, objSpawn.ShowOnClient, true, objSpawn.ShowAppearance);
                         }
                     }
                 }

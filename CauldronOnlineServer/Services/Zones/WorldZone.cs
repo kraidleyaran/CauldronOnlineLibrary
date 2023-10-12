@@ -57,7 +57,7 @@ namespace CauldronOnlineServer.Services.Zones
                 var tile = GetTile(spawnData.Tile);
                 if (tile != null)
                 {
-                    ObjectManager.RequestObject(spawnData.Spawn.DisplayName, spawnData.Spawn.Traits, spawnData.Spawn.Parameters, tile.WorldPosition, spawnData.Spawn.IsMonster, null, spawnData.Spawn.ShowOnClient);
+                    ObjectManager.RequestObject(spawnData.Spawn.DisplayName, spawnData.Spawn.Traits, spawnData.Spawn.ShowOnClient, spawnData.Spawn.Parameters, tile.WorldPosition, spawnData.Spawn.IsMonster, null, spawnData.Spawn.ShowOnClient);
                 }
             }
 
@@ -67,7 +67,18 @@ namespace CauldronOnlineServer.Services.Zones
 
         public bool IsValidPosition(WorldVector2Int worldPos)
         {
-            return _tiles.ContainsKey(worldPos / WorldServer.Settings.TileSize);
+            return _tiles.ContainsKey(new WorldVector2Int((int)Math.Floor((worldPos.X + CauldronUtils.kEpsilon) / WorldServer.Settings.TileSize), (int)Math.Floor((worldPos.Y + CauldronUtils.kEpsilon) / WorldServer.Settings.TileSize)));
+        }
+
+        public ZoneTile FindClosestTile(ZoneTile previousTile, WorldVector2Int currentPos)
+        {
+            var distance = currentPos.Distance(previousTile.WorldPosition);
+            var tile = GetTilesInPovArea(previousTile, distance).OrderBy(t => currentPos.Distance(t.WorldPosition)).FirstOrDefault();
+            if (tile != null)
+            {
+                return tile;
+            }
+            return previousTile;
         }
 
         public ZoneTile GetTileByWorldPosition(WorldVector2Int worldPos)

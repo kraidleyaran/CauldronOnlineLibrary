@@ -5,12 +5,16 @@ using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Services.Items;
 using CauldronOnlineServer.Services.Zones;
+using CauldronOnlineServer.Services.Zones.Managers;
 
 namespace CauldronOnlineServer.Services.Traits
 {
     public class LootChestTrait : ChestTrait
     {
         private LootChestParameter _parameter = new LootChestParameter();
+
+        private TickTimer _refillTimer = null;
+        private TickTimer _destroyTimer = null;
 
         public LootChestTrait(LootChestParameter parameter)
         {
@@ -27,6 +31,10 @@ namespace CauldronOnlineServer.Services.Traits
                 _parameter.OpenSprite = lootData.OpenSprite;
                 _parameter.ClosedSprite = lootData.ClosedSprite;
                 _parameter.Hitbox = lootData.Hitbox;
+                _parameter.RefillChest = lootData.RefillChest;
+                _parameter.RefillTicks = lootData.RefillTicks;
+                _parameter.DestroyAfterOpen = lootData.DestroyAfterOpen;
+                _parameter.DestroyTicks = lootData.DestroyTicks;
             }
         }
 
@@ -50,10 +58,65 @@ namespace CauldronOnlineServer.Services.Traits
                         zone.EventManager.RegisterEvent(new SpawnLootEvent { Drops = _parameter.Drops, LootTable = lootTable, Position = _parent.Data.Position, OwnerId = _parent.Data.Id});
                     }
                 }
+
+                if (_parameter.RefillChest)
+                {
+                    _refillTimer = new TickTimer(_parameter.RefillTicks.Roll(true), 0, _parent.ZoneId);
+                    _refillTimer.OnComplete += RefillChest;
+                }
+                if (_parameter.DestroyAfterOpen)
+                {
+                    _destroyTimer = new TickTimer(_parameter.DestroyTicks, 0, _parent.ZoneId);
+                    _destroyTimer.OnComplete += DestroyChest;
+                }
                 base.OpenChest();
             }
 
             return _open;
+        }
+
+        private void RefillChest()
+        {
+            _refillTimer.Destroy();
+            _refillTimer = null;
+            if (_open)
+            {
+                _open = false;
+                _parameter.Open = false;
+                var zone = ZoneService.GetZoneById(_parent.ZoneId);
+                if (zone != null)
+                {
+                    zone.EventManager.RegisterEvent(new ChestRefillEvent{TargetId = _parent.Data.Id});
+                }
+            }
+        }
+
+        private void DestroyChest()
+        {
+            _destroyTimer.Destroy();
+            _destroyTimer = null;
+            if (!_open)
+            {
+                var zone = ZoneService.GetZoneById(_parent.ZoneId);
+                if (zone != null)
+                {
+                    zone.ObjectManager.RequestDestroyObject(_parent.Data.Id);
+                }
+            }
+        }
+
+        public override void Destroy()
+        {
+            if (_refillTimer != null)
+            {
+                _refillTimer.Destroy();
+            }
+
+            if (_destroyTimer != null)
+            {
+                _destroyTimer.Destroy();
+            }
+            base.Destroy();
         }
     }
 }

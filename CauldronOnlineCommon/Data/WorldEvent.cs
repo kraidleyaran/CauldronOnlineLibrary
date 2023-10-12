@@ -22,6 +22,7 @@ namespace CauldronOnlineCommon.Data.WorldEvents
         public const int ID = 1;
         public override int EventId => ID;
         public ClientObjectData Data { get; set; }
+        public bool ShowAppearance { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptOut)]
@@ -208,10 +209,41 @@ namespace CauldronOnlineCommon.Data.WorldEvents
 
     [JsonObject(MemberSerialization.OptOut)]
     [Serializable]
-    public class ChestEvent : WorldEvent
+    public class ChestOpenEvent : WorldEvent
     {
         public const int ID = 18;
         public override int EventId => ID;
         public string TargetId { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ChestRefillEvent : WorldEvent
+    {
+        public const int ID = 19;
+        public override int EventId => ID;
+        public string TargetId { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class TeleportEvent : WorldEvent
+    {
+        public const int ID = 20;
+        public override int EventId => ID;
+        public string ObjectId { get; set; }
+        public WorldVector2Int Position { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class KeyItemLootEvent : WorldEvent
+    {
+        public const int ID = 21;
+        public override int EventId => ID;
+        public string TargetId { get; set; }
+        public string Item { get; set; }
+        public int Stack { get; set; }
+        public WorldVector2Int Position { get; set; }
     }
 }

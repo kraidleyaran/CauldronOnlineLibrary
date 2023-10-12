@@ -13,6 +13,7 @@ using CauldronOnlineServer.Services.Client;
 using CauldronOnlineServer.Services.Combat;
 using CauldronOnlineServer.Services.Commands;
 using CauldronOnlineServer.Services.Items;
+using CauldronOnlineServer.Services.Quests;
 using CauldronOnlineServer.Services.Traits;
 using CauldronOnlineServer.Services.TriggerEvents;
 using CauldronOnlineServer.Services.Zones;
@@ -42,17 +43,17 @@ namespace CauldronOnlineServer
         {
             _instance = this;
             _settings = settings;
-            _logging = new WorldLogging(_settings.BaseFolder);
+            _logging = new WorldLogging($"{_settings.BaseFolder}{Path.DirectorySeparatorChar}{_settings.LogSubFolder}");
             _services = new WorldService[]
             {
                 new ClientService(),
                 new RNGService(),
+                new QuestService(),
                 new CombatService($"{_settings.BaseFolder}{Path.DirectorySeparatorChar}{_settings.CombatSettingsSubPath}"), 
-                new TraitService($"{_settings.BaseFolder}{Path.DirectorySeparatorChar}{_settings.TraitSubFolder}"), 
+                new TraitService($"{_settings.BaseFolder}{Path.DirectorySeparatorChar}{_settings.TraitSubFolder}"),
+                new TriggerEventService($"{_settings.BaseFolder}{Path.DirectorySeparatorChar}{_settings.TriggerEventsSubFolder}"),
                 new ZoneService($"{_settings.BaseFolder}{Path.DirectorySeparatorChar}{_settings.ZoneSubFolder}"),
                 new ItemService($"{_settings.BaseFolder}{Path.DirectorySeparatorChar}{_settings.LootTableSubFolder}"),
-                new TriggerEventService($"{_settings.BaseFolder}{Path.DirectorySeparatorChar}{_settings.TriggerEventsSubFolder}"),
-                new KeyItemService(), 
                 new CommandService(),
             };
         }

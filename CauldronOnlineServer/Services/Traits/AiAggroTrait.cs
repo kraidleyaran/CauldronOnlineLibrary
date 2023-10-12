@@ -89,7 +89,6 @@ namespace CauldronOnlineServer.Services.Traits
                                     _currentPath.Clear();
                                     this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
                                 }
-                                WorldServer.Log($"[AGGRO] - Aggro dropped - {obj.Value}");
                                 _currentTarget = string.Empty;
                                 _lastTargetTile = null;
                             }
@@ -238,7 +237,7 @@ namespace CauldronOnlineServer.Services.Traits
                                     if (!_pov.Contains(targetObj.Tile))
                                     {
                                         _aggrod[_currentTarget] += CombatService.Settings.AggroPerPovCheck();
-                                        WorldServer.Log($"[AGGRO] - Aggro reduced - Not in Pov - {_aggrod[_currentTarget]}");
+                                        
                                     }
                                     if (_lastTargetTile == null || _lastTargetTile != targetObj.Tile)
                                     {
@@ -256,7 +255,6 @@ namespace CauldronOnlineServer.Services.Traits
                                             {
                                                 _aggrod[_currentTarget] += CombatService.Settings.AggroPerPathChangeCheck(2);
                                                 _currentPath.Clear();
-                                                WorldServer.Log($"[AGGRO] - Path Cleared - Different directions - {_aggrod[_currentTarget]}");
                                                 this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
                                             }
                                         }

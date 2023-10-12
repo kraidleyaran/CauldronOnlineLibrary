@@ -165,12 +165,21 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                                         }
                                     }
                                     break;
-                                case ChestEvent.ID:
-                                    if (worldEvent is ChestEvent chest)
+                                case ChestOpenEvent.ID:
+                                    if (worldEvent is ChestOpenEvent chest)
                                     {
                                         if (zone.ObjectManager.TryGetObjectById(chest.TargetId, out var obj))
                                         {
                                             obj.SendMessageTo(OpenChestMessage.INSTANCE, obj);
+                                        }
+                                    }
+                                    break;
+                                case TeleportEvent.ID:
+                                    if (worldEvent is TeleportEvent teleport)
+                                    {
+                                        if (zone.ObjectManager.TryGetObjectById(teleport.ObjectId, out var obj))
+                                        {
+                                            obj.SetPosition(teleport.Position);
                                         }
                                     }
                                     break;

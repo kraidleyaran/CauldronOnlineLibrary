@@ -91,6 +91,10 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<ClientDoorCheckMessage>(json, _settings);
                 case ClientOpenChestMessage.ID:
                     return JsonConvert.DeserializeObject<ClientOpenChestMessage>(json, _settings);
+                case ClientMultiPartMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientMultiPartMessage>(json, _settings);
+                case ClientTeleportMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientTeleportMessage>(json, _settings);
             }
         }
 
@@ -134,8 +138,14 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<SwitchSignalEvent>(json, _settings);
                 case DoorCheckEvent.ID:
                     return JsonConvert.DeserializeObject<DoorCheckEvent>(json, _settings);
-                case ChestEvent.ID:
-                    return JsonConvert.DeserializeObject<ChestEvent>(json, _settings);
+                case ChestOpenEvent.ID:
+                    return JsonConvert.DeserializeObject<ChestOpenEvent>(json, _settings);
+                case ChestRefillEvent.ID:
+                    return JsonConvert.DeserializeObject<ChestRefillEvent>(json, _settings);
+                case TeleportEvent.ID:
+                    return JsonConvert.DeserializeObject<TeleportEvent>(json, _settings);
+                case KeyItemLootEvent.ID:
+                    return JsonConvert.DeserializeObject<KeyItemLootEvent>(json, _settings);
                 default:
                     return original;
             }
@@ -179,6 +189,8 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<GroupSpawnParameter>(json, _settings);
                 case LootChestParameter.TYPE:
                     return JsonConvert.DeserializeObject<LootChestParameter>(json, _settings);
+                case KeyItemChestParameter.TYPE:
+                    return JsonConvert.DeserializeObject<KeyItemChestParameter>(json, _settings);
                 default:
                     return original;
             }

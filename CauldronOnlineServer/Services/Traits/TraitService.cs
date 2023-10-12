@@ -106,6 +106,12 @@ namespace CauldronOnlineServer.Services.Traits
                     return new TimerTrait(data);
                 case ChargeTraitData.TYPE:
                     return new ChargeTrait(data);
+                case KeyItemChestTraitData.TYPE:
+                    return new KeyItemChestTrait(data);
+                case ZoneQuestTraitData.TYPE:
+                    return new ZoneQuestTrait(data);
+                case SpawnObjectTraitData.TYPE:
+                    return new SpawnObjectTrait(data);
                 default:
                     return new WorldTrait(data);
             }

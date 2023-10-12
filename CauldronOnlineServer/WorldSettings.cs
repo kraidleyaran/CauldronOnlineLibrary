@@ -10,6 +10,7 @@ namespace CauldronOnlineServer
         public int MessageTick { get; set; }
         public int ZoneTick { get; set; }
         public string BaseFolder { get; set; }
+        public string LogSubFolder { get; set; }
         public string ZoneSubFolder { get; set; }
         public string TraitSubFolder { get; set; }
         public string LootTableSubFolder { get; set; }

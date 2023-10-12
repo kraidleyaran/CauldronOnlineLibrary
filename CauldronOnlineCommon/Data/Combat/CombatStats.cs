@@ -63,6 +63,7 @@ namespace CauldronOnlineCommon.Data.Combat
             Mana = a.Mana * multiplier,
             Armor = a.Armor * multiplier,
             Strength = a.Strength * multiplier,
+            Agility = a.Agility * multiplier,
             Wisdom = a.Wisdom * multiplier,
             Luck = a.Luck * multiplier
         };

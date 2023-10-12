@@ -87,7 +87,7 @@ namespace CauldronOnlineServer.Services.Traits
                     if (zone != null)
                     {
                         var tile = _spawnableTiles.Length > 1 ? _spawnableTiles[RNGService.Range(0, _spawnableTiles.Length)] : _spawnableTiles[0];
-                        zone.ObjectManager.RequestObject(_spawnData.DisplayName, _spawnData.Traits, _spawnData.Parameters, tile.WorldPosition, _spawnData.IsMonster, OnUnitSpawned, _spawnData.ShowOnClient, true);
+                        zone.ObjectManager.RequestObject(_spawnData.DisplayName, _spawnData.Traits, _spawnData.ShowNameOnClient, _spawnData.Parameters, tile.WorldPosition, _spawnData.IsMonster, OnUnitSpawned, _spawnData.ShowOnClient, true, _spawnData.ShowAppearance);
                     }
                 }
             }

@@ -11,5 +11,7 @@ namespace CauldronOnlineCommon.Data.Zones
         public ObjectParameter[] Parameters;
         public bool IsMonster;
         public bool ShowOnClient;
+        public bool ShowNameOnClient;
+        public bool ShowAppearance;
     }
 }
