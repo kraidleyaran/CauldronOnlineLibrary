@@ -210,6 +210,18 @@ namespace CauldronOnlineServer.Services.Zones
             }
         }
 
+        public ZoneTile[] GetBorderTilesInCircle(ZoneTile pos, int area)
+        {
+            var cells = _pathingMap.GetBorderCellsInCircle(pos.Cell.X, pos.Cell.Y, area);
+            return cells.Select(c => GetTileByCellPosition(new WorldVector2Int(c.X, c.Y))).ToArray();
+        }
+
+        public ZoneTile[] GetBorderTilesInSquare(ZoneTile pos, int area)
+        {
+            var cells = _pathingMap.GetBorderCellsInSquare(pos.Cell.X, pos.Cell.Y, area);
+            return cells.Select(c => GetTileByCellPosition(new WorldVector2Int(c.X, c.Y))).ToArray();
+        }
+
         private void SubscribeToMessages()
         {
             this.SubscribeWithFilter<ZoneUpdateTickMessage>(ZoneUpdateTick, Id);

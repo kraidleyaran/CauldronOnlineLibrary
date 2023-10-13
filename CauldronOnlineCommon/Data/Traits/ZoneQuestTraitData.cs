@@ -14,6 +14,7 @@ namespace CauldronOnlineCommon.Data.Traits
         public int Range;
         public string[] ApplyOnComplete;
         public string[] TriggerEventsOnComplete;
+        public bool ResetQuest;
         public WorldIntRange ResetTicks;
     }
 }

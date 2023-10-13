@@ -63,13 +63,17 @@ namespace CauldronOnlineServer.Services.TriggerEvents
 
         public static void TriggerEvent(string eventName)
         {
-            if (!_instance._triggered.TryGetValue(eventName, out var worldEvent) && _instance._events.TryGetValue(eventName, out var eventData))
+            if (!_instance._triggered.TryGetValue(eventName, out var worldEvent))
             {
-                worldEvent = new TriggerEvent {Name = eventData.Name, MaxActivations = eventData.MaxActivations};
-                _instance._triggered.TryAdd(eventName, worldEvent);
+                
+                if (_instance._events.TryGetValue(eventName, out var eventData))
+                {
+                    worldEvent = new TriggerEvent { Name = eventData.Name, MaxActivations = eventData.MaxActivations };
+                    _instance._triggered.TryAdd(eventName, worldEvent);
+                }
             }
 
-            if (worldEvent != null && worldEvent.Activations < worldEvent.MaxActivations)
+            if (worldEvent != null && (worldEvent.Activations < worldEvent.MaxActivations || worldEvent.MaxActivations <= 0))
             {
                 _instance.Log($"Trigger Activated - {worldEvent.Name}");
                 worldEvent.Activations++;

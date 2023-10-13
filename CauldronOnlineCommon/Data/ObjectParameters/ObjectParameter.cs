@@ -217,6 +217,7 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public int Range { get; set; }
         public string[] ApplyOnComplete { get; set; }
         public string[] TriggerEventOnComplete { get; set; }
+        public bool ResetQuest { get; set; }
         public WorldIntRange ResetTicks { get; set; }
     }
 

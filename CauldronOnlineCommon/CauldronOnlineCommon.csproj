@@ -58,6 +58,7 @@
     <Compile Include="Data\ClientCharacterData.cs" />
     <Compile Include="Data\ClientObjectData.cs" />
     <Compile Include="Data\Combat\AbilitySight.cs" />
+    <Compile Include="Data\Combat\AggroType.cs" />
     <Compile Include="Data\Combat\AiAbilityData.cs" />
     <Compile Include="Data\Combat\ApplyHitboxData.cs" />
     <Compile Include="Data\Combat\CombatSettings.cs" />

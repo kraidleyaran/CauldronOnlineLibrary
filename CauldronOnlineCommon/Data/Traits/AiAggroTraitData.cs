@@ -1,4 +1,5 @@
 ﻿using System;
+using CauldronOnlineCommon.Data.Combat;
 
 namespace CauldronOnlineCommon.Data.Traits
 {
@@ -12,5 +13,6 @@ namespace CauldronOnlineCommon.Data.Traits
         public int DefaultAggro;
         public string[] ApplyOnAggro = new string[0];
         public float DiagonalCost = 0f;
+        public AggroType AggroType;
     }
 }

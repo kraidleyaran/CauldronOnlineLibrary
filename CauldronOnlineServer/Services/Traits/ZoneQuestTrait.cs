@@ -16,7 +16,6 @@ namespace CauldronOnlineServer.Services.Traits
         private QuestObjective[] _questObjectives = new QuestObjective[0];
         private ZoneQuestParameter _parameter = new ZoneQuestParameter();
         private bool _completed = false;
-        
 
         private TickTimer _resetTimer = null;
 
@@ -28,6 +27,7 @@ namespace CauldronOnlineServer.Services.Traits
                 _parameter.ApplyOnComplete = zoneQuest.ApplyOnComplete;
                 _parameter.TriggerEventOnComplete = zoneQuest.TriggerEventsOnComplete;
                 _parameter.Range = zoneQuest.Range;
+                _parameter.ResetQuest = zoneQuest.ResetQuest;
                 _parameter.ResetTicks = zoneQuest.ResetTicks;
             }
         }
@@ -94,8 +94,12 @@ namespace CauldronOnlineServer.Services.Traits
                         {
                             TriggerEventService.TriggerEvent(triggerEvent);
                         }
-                        _resetTimer = new TickTimer(_parameter.ResetTicks.Roll(true), 0, _parent.ZoneId);
-                        _resetTimer.OnComplete += ResetTimerFinished;
+
+                        if (_parameter.ResetQuest)
+                        {
+                            _resetTimer = new TickTimer(_parameter.ResetTicks.Roll(true), 0, _parent.ZoneId);
+                            _resetTimer.OnComplete += ResetTimerFinished;
+                        }
                     }
                 }
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.ObjectParameters;
 using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineServer.Requests;
@@ -24,6 +25,7 @@ namespace CauldronOnlineServer.Services.Traits
         private List<ZoneTile> _pov = new List<ZoneTile>();
         private string[] _applyOnAggro = new string[0];
         private float _diagonalCost = 0f;
+        private AggroType _aggroType = AggroType.Aggressive;
 
         private ConcurrentQueue<AggroRequest> _aggroRequests = new ConcurrentQueue<AggroRequest>();
 
@@ -41,6 +43,7 @@ namespace CauldronOnlineServer.Services.Traits
                 _defaultAggro = aggroData.DefaultAggro;
                 _applyOnAggro = aggroData.ApplyOnAggro;
                 _diagonalCost = aggroData.DiagonalCost;
+                _aggroType = aggroData.AggroType;
             }
         }
 
@@ -56,9 +59,214 @@ namespace CauldronOnlineServer.Services.Traits
             SubscribeToMessages();
         }
 
+        private void AggressivePathingCheck(WorldZone zone)
+        {
+            if (_currentPath.Count <= 0)
+            {
+                if (_aiState != AiState.Aggro)
+                {
+                    this.SendMessageTo(new SetAiStateMessage { State = AiState.Aggro }, _parent);
+                }
+
+                if (zone.ObjectManager.TryGetObjectById(_currentTarget, out var targetObj))
+                {
+                    _lastTargetTile = targetObj.Tile;
+                    var path = zone.FindPath(_parent.Tile, _lastTargetTile, _aggroRange, _diagonalCost);
+                    if (path.Length > 0)
+                    {
+                        _currentPath = path.ToList();
+                        this.SendMessageTo(new SetCurrentPathMessage { Path = path }, _parent);
+                    }
+                }
+                else
+                {
+                    _aggrod.Remove(_currentTarget);
+                    _currentTarget = string.Empty;
+                    _lastTargetTile = null;
+                }
+            }
+            else
+            {
+                if (zone.ObjectManager.TryGetObjectById(_currentTarget, out var targetObj))
+                {
+                    if (!_pov.Contains(targetObj.Tile))
+                    {
+                        _aggrod[_currentTarget] += CombatService.Settings.AggroPerPovCheck();
+
+                    }
+                    if (_lastTargetTile == null || _lastTargetTile != targetObj.Tile)
+                    {
+                        _lastTargetTile = targetObj.Tile;
+                    }
+
+                    if (_currentPath[_currentPath.Count - 1] != _lastTargetTile)
+                    {
+                        var tileIndex = _currentPath.IndexOf(_lastTargetTile);
+                        if (tileIndex < 0)
+                        {
+                            var targetDirection = _parent.Tile.Position.Direction(_lastTargetTile.Position);
+                            var currentDirection = _parent.Tile.Position.Direction(_currentPath[_currentPath.Count - 1].Position);
+                            if (targetDirection != currentDirection)
+                            {
+                                _aggrod[_currentTarget] += CombatService.Settings.AggroPerPathChangeCheck(2);
+                                _currentPath.Clear();
+                                this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    _lastTargetTile = null;
+                    _aggrod.Remove(_currentTarget);
+                    _aware.Remove(_currentTarget);
+                    _currentTarget = string.Empty;
+                    _currentPath.Clear();
+                    this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
+                }
+
+            }
+        }
+
+        private void DefensivePathingCheck(WorldZone zone)
+        {
+            if (_currentPath.Count <= 0)
+            {
+                if (_aiState != AiState.Aggro)
+                {
+                    this.SendMessageTo(new SetAiStateMessage { State = AiState.Aggro }, _parent);
+                }
+
+                if (zone.ObjectManager.TryGetObjectById(_currentTarget, out var targetObj))
+                {
+                    _lastTargetTile = targetObj.Tile;
+                    var targetDirection = _parent.Tile.Position.Direction(_lastTargetTile.Position);
+                    var defensiveTiles = zone.GetBorderTilesInCircle(_lastTargetTile, _aggroRange / 2).Where(t => t != null && _parent.Tile.Position.Direction(t.Position) != targetDirection).ToArray();
+                    if (defensiveTiles.Length > 0)
+                    {
+                        var tile = defensiveTiles.Length > 1 ? defensiveTiles[RNGService.Range(0, defensiveTiles.Length)] : defensiveTiles[0];
+                        var path = zone.FindPath(_parent.Tile, tile, _aggroRange, _diagonalCost);
+                        if (path.Length > 0)
+                        {
+                            _currentPath = path.ToList();
+                            this.SendMessageTo(new SetCurrentPathMessage { Path = path }, _parent);
+                        }
+                    }
+
+                }
+                else
+                {
+                    _aggrod.Remove(_currentTarget);
+                    _currentTarget = string.Empty;
+                    _lastTargetTile = null;
+                }
+            }
+            else
+            {
+                if (zone.ObjectManager.TryGetObjectById(_currentTarget, out var targetObj))
+                {
+                    if (!_pov.Contains(targetObj.Tile))
+                    {
+                        _aggrod[_currentTarget] += CombatService.Settings.AggroPerPovCheck();
+
+                    }
+                    if (_lastTargetTile == null || _lastTargetTile != targetObj.Tile)
+                    {
+                        _lastTargetTile = targetObj.Tile;
+                    }
+
+                    var targetDistance = _parent.Tile.Position.Distance(_lastTargetTile.Position);
+                    if (targetDistance > _aggroRange || targetDistance < _aggroRange / 2)
+                    {
+                        _aggrod[_currentTarget] += CombatService.Settings.AggroPerPathChangeCheck(2);
+                        _currentPath.Clear();
+                        this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
+                    }
+                }
+                else
+                {
+                    _lastTargetTile = null;
+                    _aggrod.Remove(_currentTarget);
+                    _aware.Remove(_currentTarget);
+                    _currentTarget = string.Empty;
+                    _currentPath.Clear();
+                    this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
+                }
+
+            }
+        }
+
+        private void PassivePathingCheck(WorldZone zone)
+        {
+            if (_currentPath.Count <= 0)
+            {
+                if (_aiState != AiState.Aggro)
+                {
+                    this.SendMessageTo(new SetAiStateMessage { State = AiState.Aggro }, _parent);
+                }
+
+                if (zone.ObjectManager.TryGetObjectById(_currentTarget, out var targetObj))
+                {
+                    _lastTargetTile = targetObj.Tile;
+                    var passiveTiles = zone.GetTilesInPovArea(_lastTargetTile, _aggroRange);
+                    if (passiveTiles.Length > 0)
+                    {
+                        var tile = passiveTiles.Length > 1 ? passiveTiles[RNGService.Range(0, passiveTiles.Length)] : passiveTiles[0];
+                        var path = zone.FindPath(_parent.Tile, tile, _aggroRange, _diagonalCost);
+                        if (path.Length > 0)
+                        {
+                            _currentPath = path.ToList();
+                            this.SendMessageTo(new SetCurrentPathMessage { Path = path }, _parent);
+                        }
+                    }
+
+                }
+                else
+                {
+                    _aggrod.Remove(_currentTarget);
+                    _currentTarget = string.Empty;
+                    _lastTargetTile = null;
+                }
+            }
+            else
+            {
+                if (zone.ObjectManager.TryGetObjectById(_currentTarget, out var targetObj))
+                {
+                    if (!_pov.Contains(targetObj.Tile))
+                    {
+                        _aggrod[_currentTarget] += CombatService.Settings.AggroPerPovCheck();
+
+                    }
+                    if (_lastTargetTile == null || _lastTargetTile != targetObj.Tile)
+                    {
+                        _lastTargetTile = targetObj.Tile;
+                    }
+
+                    var targetDistance = _parent.Tile.Position.Distance(_lastTargetTile.Position);
+                    if (targetDistance > _aggroRange)
+                    {
+                        _aggrod[_currentTarget] += CombatService.Settings.AggroPerPathChangeCheck(2);
+                        _currentPath.Clear();
+                        this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
+                    }
+                }
+                else
+                {
+                    _lastTargetTile = null;
+                    _aggrod.Remove(_currentTarget);
+                    _aware.Remove(_currentTarget);
+                    _currentTarget = string.Empty;
+                    _currentPath.Clear();
+                    this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
+                }
+
+            }
+        }
+
         private void SubscribeToMessages()
         {
             this.SubscribeWithFilter<ZoneUpdateTickMessage>(ZoneUpdateTick, _parent.ZoneId);
+            this.SubscribeWithFilter<RemoveFromAggroMessage>(RemoveFromAggro, _parent.Data.Id);
             _parent.SubscribeWithFilter<UpdateAiStateMessage>(UpdateAiState, _id);
             _parent.SubscribeWithFilter<ZoneTileUpdatedMessage>(ZoneTileUpdated, _id);
             _parent.SubscribeWithFilter<AggroRequestMessage>(AggroRequest, _id);
@@ -206,80 +414,27 @@ namespace CauldronOnlineServer.Services.Traits
 
                         if (!usedAbility)
                         {
-                            if (_currentPath.Count <= 0)
+                            switch (_aggroType)
                             {
-                                if (_aiState != AiState.Aggro)
-                                {
-                                    this.SendMessageTo(new SetAiStateMessage { State = AiState.Aggro }, _parent);
-                                }
-
-                                if (zone.ObjectManager.TryGetObjectById(_currentTarget, out var targetObj))
-                                {
-                                    _lastTargetTile = targetObj.Tile;
-                                    var path = zone.FindPath(_parent.Tile, _lastTargetTile, _aggroRange, _diagonalCost);
-                                    if (path.Length > 0)
-                                    {
-                                        _currentPath = path.ToList();
-                                        this.SendMessageTo(new SetCurrentPathMessage { Path = path }, _parent);
-                                    }
-                                }
-                                else
-                                {
-                                    _aggrod.Remove(_currentTarget);
-                                    _currentTarget = string.Empty;
-                                    _lastTargetTile = null;
-                                }
-                            }
-                            else
-                            {
-                                if (zone.ObjectManager.TryGetObjectById(_currentTarget, out var targetObj))
-                                {
-                                    if (!_pov.Contains(targetObj.Tile))
-                                    {
-                                        _aggrod[_currentTarget] += CombatService.Settings.AggroPerPovCheck();
-                                        
-                                    }
-                                    if (_lastTargetTile == null || _lastTargetTile != targetObj.Tile)
-                                    {
-                                        _lastTargetTile = targetObj.Tile;
-                                    }
-
-                                    if (_currentPath[_currentPath.Count - 1] != _lastTargetTile)
-                                    {
-                                        var tileIndex = _currentPath.IndexOf(_lastTargetTile);
-                                        if (tileIndex < 0)
-                                        {
-                                            var targetDirection = _parent.Tile.Position.Direction(_lastTargetTile.Position);
-                                            var currentDirection = _parent.Tile.Position.Direction(_currentPath[_currentPath.Count - 1].Position);
-                                            if (targetDirection != currentDirection)
-                                            {
-                                                _aggrod[_currentTarget] += CombatService.Settings.AggroPerPathChangeCheck(2);
-                                                _currentPath.Clear();
-                                                this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    _lastTargetTile = null;
-                                    _aggrod.Remove(_currentTarget);
-                                    _aware.Remove(_currentTarget);
-                                    _currentTarget = string.Empty;
-                                    _currentPath.Clear();
-                                    this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
-                                }
-
+                                case AggroType.Aggressive:
+                                    AggressivePathingCheck(zone);
+                                    break;
+                                case AggroType.Defensive:
+                                    DefensivePathingCheck(zone);
+                                    break;
+                                case AggroType.Passive:
+                                    PassivePathingCheck(zone);
+                                    break;
                             }
 
                         }
 
                     }
                 }
-                
-                
+
+
             }
-            
+
         }
 
         private void UpdateAiState(UpdateAiStateMessage msg)
