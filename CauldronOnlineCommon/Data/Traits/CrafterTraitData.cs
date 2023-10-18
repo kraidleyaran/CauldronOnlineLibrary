@@ -5,12 +5,12 @@ using CauldronOnlineCommon.Data.Items;
 namespace CauldronOnlineCommon.Data.Traits
 {
     [Serializable]
-    public class ShopTraitData : WorldTraitData
+    public class CrafterTraitData : WorldTraitData
     {
-        public const string TYPE = "Shop";
+        public const string TYPE = "Crafter";
         public override string Type => TYPE;
-        public ShopItemData[] Items;
-        public RestrictedShopItemData[] Restricted;
+
+        public ItemRecipeData[] Recipes;
         public HitboxData Hitbox;
     }
 }

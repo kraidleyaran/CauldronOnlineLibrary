@@ -29,7 +29,10 @@ namespace CauldronOnlineServer.Services.Traits
                 var tile = zone.GetTile(_parent.Tile.Position + _zoneSpawn.Tile);
                 if (tile != null)
                 {
-                    zone.ObjectManager.RequestObject(_zoneSpawn.Spawn.DisplayName, _zoneSpawn.Spawn.Traits, _zoneSpawn.Spawn.ShowNameOnClient, _zoneSpawn.Spawn.Parameters, tile.WorldPosition, _zoneSpawn.Spawn.IsMonster, null, _zoneSpawn.Spawn.ShowOnClient,true, _zoneSpawn.Spawn.ShowAppearance);
+                    zone.ObjectManager.RequestObject(_zoneSpawn.Spawn.DisplayName, _zoneSpawn.Spawn.Traits,
+                        _zoneSpawn.Spawn.ShowNameOnClient, _zoneSpawn.Spawn.Parameters, tile.WorldPosition,
+                        _zoneSpawn.Spawn.IsMonster, null, _zoneSpawn.Spawn.ShowOnClient, true,
+                        _zoneSpawn.Spawn.ShowAppearance, _zoneSpawn.StartActive);
                 }
             }
         }

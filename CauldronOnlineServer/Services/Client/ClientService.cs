@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CauldronOnlineCommon;
 
 namespace CauldronOnlineServer.Services.Client
@@ -80,6 +81,11 @@ namespace CauldronOnlineServer.Services.Client
         public static bool HasConnectionId(int connectionId)
         {
             return _instance._reverseLookup.ContainsKey(connectionId);
+        }
+
+        public static int[] GetAllClients()
+        {
+            return _instance._reverseLookup.Keys.ToArray();
         }
     }
 }

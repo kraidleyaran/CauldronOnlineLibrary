@@ -75,7 +75,7 @@ namespace CauldronOnlineServer.Services.Items
         {
             if (_instance._keyItems.TryGetValue(item, out var currentStack))
             {
-                _instance._keyItems.TryUpdate(item, stack + currentStack, stack);
+                _instance._keyItems.TryUpdate(item, stack + currentStack, currentStack);
             }
             else
             {
@@ -95,7 +95,7 @@ namespace CauldronOnlineServer.Services.Items
         {
             if (_instance._keyItems.TryGetValue(item, out var currentStack))
             {
-                return stack >= currentStack;
+                return currentStack >= stack;
             }
 
             return false;

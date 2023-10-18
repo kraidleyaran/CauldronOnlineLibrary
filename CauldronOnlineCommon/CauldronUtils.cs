@@ -95,6 +95,10 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<ClientMultiPartMessage>(json, _settings);
                 case ClientTeleportMessage.ID:
                     return JsonConvert.DeserializeObject<ClientTeleportMessage>(json, _settings);
+                case ClientItemRewardMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientItemRewardMessage>(json, _settings);
+                case ClientProjectileMovementUpdateMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientProjectileMovementUpdateMessage>(json, _settings);
             }
         }
 
@@ -146,6 +150,10 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<TeleportEvent>(json, _settings);
                 case KeyItemLootEvent.ID:
                     return JsonConvert.DeserializeObject<KeyItemLootEvent>(json, _settings);
+                case ObjectStateEvent.ID:
+                    return JsonConvert.DeserializeObject<ObjectStateEvent>(json, _settings);
+                case BridgeStateEvent.ID:
+                    return JsonConvert.DeserializeObject<BridgeStateEvent>(json, _settings);
                 default:
                     return original;
             }
@@ -191,6 +199,12 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<LootChestParameter>(json, _settings);
                 case KeyItemChestParameter.TYPE:
                     return JsonConvert.DeserializeObject<KeyItemChestParameter>(json, _settings);
+                case ZoneTransitionParameter.TYPE:
+                    return JsonConvert.DeserializeObject<ZoneTransitionParameter>(json, _settings);
+                case CrafterParameter.TYPE:
+                    return JsonConvert.DeserializeObject<CrafterParameter>(json, _settings);
+                case BridgeParameter.TYPE:
+                    return JsonConvert.DeserializeObject<BridgeParameter>(json, _settings);
                 default:
                     return original;
             }

@@ -4,11 +4,11 @@ using CauldronOnlineCommon.Data.Switches;
 namespace CauldronOnlineCommon.Data.Traits
 {
     [Serializable]
-    public class SwitchSignalReceiverTraitData : WorldTraitData
+    public class MultiSwitchSignalReceiverTraitData : WorldTraitData
     {
-        public const string TYPE = "SwitchSignalReceiver";
+        public const string TYPE = "MultiSwitchSignalReceiver";
         public override string Type => TYPE;
 
-        public OnSwitchSignalData[] OnSignals;
+        public OnMultiSwitchSignalData Data;
     }
 }

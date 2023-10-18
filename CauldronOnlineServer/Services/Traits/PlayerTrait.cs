@@ -95,6 +95,7 @@ namespace CauldronOnlineServer.Services.Traits
             this.SubscribeWithFilter<ClientDoorCheckMessage>(ClientDoorCheck, _worldId);
             this.SubscribeWithFilter<ClientOpenChestMessage>(ClientOpenChest, _worldId);
             this.SubscribeWithFilter<ClientTeleportMessage>(ClientTeleport, _worldId);
+            this.SubscribeWithFilter<ClientProjectileMovementUpdateMessage>(ClientProjectileMovementUpdate, _worldId);
             
             _parent.SubscribeWithFilter<ApplyExperienceMessage>(ApplyExperience, _id);
         }
@@ -145,9 +146,11 @@ namespace CauldronOnlineServer.Services.Traits
             if (!_disconnect)
             {
                 _disconnect = true;
+
                 var zone = ZoneService.GetZoneById(_parent.ZoneId);
                 if (zone != null)
                 {
+                    zone.EventManager.RegisterEvent(new DestroyObjectEvent { ObjectId = _parent.Data.Id, OwnerId = _parent.Data.Id });
                     zone.ObjectManager.RequestDestroyObject(_parent.Data.Id, _worldId);
                 }
             }   
@@ -375,6 +378,15 @@ namespace CauldronOnlineServer.Services.Traits
             if (zone != null)
             {
                 zone.EventManager.RegisterEvent(new DoorCheckEvent{TargetId = msg.TargetId,Tick = msg.Tick}, true);
+            }
+        }
+
+        private void ClientProjectileMovementUpdate(ClientProjectileMovementUpdateMessage msg)
+        {
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null && !zone.ObjectManager.DoesObjectExist(msg.TargetId))
+            {
+                zone.EventManager.RegisterEvent(new MovementEvent{Id = msg.TargetId, Speed = msg.Speed, Position = msg.Position, Tick = msg.Tick}, true);
             }
         }
 

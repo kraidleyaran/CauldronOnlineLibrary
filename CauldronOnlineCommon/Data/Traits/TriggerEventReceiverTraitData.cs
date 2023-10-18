@@ -10,5 +10,6 @@ namespace CauldronOnlineCommon.Data.Traits
 
         public string[] ApplyOnTriggerEvent;
         public string[] TriggerEvents;
+        public bool RequireAllEvents;
     }
 }

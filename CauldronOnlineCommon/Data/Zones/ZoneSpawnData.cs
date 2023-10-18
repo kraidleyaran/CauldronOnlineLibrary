@@ -10,5 +10,6 @@ namespace CauldronOnlineCommon.Data.Zones
         public WorldVector2Int Tile;
         public bool IsWorldPosition;
         public bool ShowAppearance;
+        public bool StartActive;
     }
 }

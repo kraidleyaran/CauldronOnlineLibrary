@@ -228,4 +228,20 @@ namespace CauldronOnlineServer
         public QuestObjective Objective;
         public int Count;
     }
+
+    public class FullHealMessage : EventMessage
+    {
+        public static FullHealMessage INSTANCE = new FullHealMessage();
+    }
+
+    public class SetObjectActiveStateMessage : EventMessage
+    {
+        public bool Active;
+    }
+
+    public class SetBridgeStateMessage : EventMessage
+    {
+        public bool Active { get; set; }
+        public bool IsEvent { get; set; }
+    }
 }

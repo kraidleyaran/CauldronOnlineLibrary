@@ -112,6 +112,16 @@ namespace CauldronOnlineServer.Services.Traits
                     return new ZoneQuestTrait(data);
                 case SpawnObjectTraitData.TYPE:
                     return new SpawnObjectTrait(data);
+                case ZoneTransitionTraitData.TYPE:
+                    return new ZoneTransitionTrait(data);
+                case CrafterTraitData.TYPE:
+                    return new CrafterTrait(data);
+                case SetObjectActiveStateTraitData.TYPE:
+                    return new SetObjectActiveStateTrait(data);
+                case ToggleObjectStateTraitData.TYPE:
+                    return new ToggleObjectStateTrait(data);
+                case MultiSwitchSignalReceiverTraitData.TYPE:
+                    return new MultiSwitchSignalReceiverTrait(data);
                 default:
                     return new WorldTrait(data);
             }

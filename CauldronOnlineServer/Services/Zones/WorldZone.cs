@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using CauldronOnlineCommon;
@@ -57,7 +56,7 @@ namespace CauldronOnlineServer.Services.Zones
                 var tile = GetTile(spawnData.Tile);
                 if (tile != null)
                 {
-                    ObjectManager.RequestObject(spawnData.Spawn.DisplayName, spawnData.Spawn.Traits, spawnData.Spawn.ShowOnClient, spawnData.Spawn.Parameters, tile.WorldPosition, spawnData.Spawn.IsMonster, null, spawnData.Spawn.ShowOnClient);
+                    ObjectManager.RequestObject(spawnData.Spawn.DisplayName, spawnData.Spawn.Traits, spawnData.Spawn.ShowOnClient, spawnData.Spawn.Parameters, tile.WorldPosition, spawnData.Spawn.IsMonster, null, spawnData.Spawn.ShowOnClient, false, false, spawnData.Spawn.StartActive);
                 }
             }
 

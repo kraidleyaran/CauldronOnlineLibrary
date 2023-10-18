@@ -1,8 +1,10 @@
-﻿using CauldronOnlineCommon.Data.Items;
+﻿using CauldronOnlineCommon;
+using CauldronOnlineCommon.Data.Items;
 using CauldronOnlineCommon.Data.ObjectParameters;
 using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Services.Items;
+using CauldronOnlineServer.Services.TriggerEvents;
 using CauldronOnlineServer.Services.Zones;
 
 namespace CauldronOnlineServer.Services.Traits
@@ -26,6 +28,7 @@ namespace CauldronOnlineServer.Services.Traits
                 _parameter.OpenSprite = chest.OpenSprite;
                 _parameter.ClosedSprite = chest.ClosedSprite;
                 _parameter.Hitbox = chest.Hitbox;
+                _parameter.ApplyEventsOnOpen = chest.ApplyTriggerEventsOnOpen;
             }
         }
 
@@ -45,7 +48,17 @@ namespace CauldronOnlineServer.Services.Traits
                 if (zone != null)
                 {
                     zone.EventManager.RegisterEvent(new ChestOpenEvent{TargetId = _parent.Data.Id});
-                    zone.EventManager.RegisterEvent(new KeyItemLootEvent{Position = _parent.Data.Position, Item = _parameter.Item.Item, Stack = _parameter.Item.Stack, TargetId = _parent.Data.Id});
+                    zone.EventManager.RegisterEvent(new KeyItemLootEvent{Position = _parent.Data.Position, Item = _parameter.Item.Item, Stack = _parameter.Item.Stack, TargetId = _parent.Data.Id});                    
+                }
+
+                foreach (var triggerEvent in _parameter.ApplyEventsOnOpen)
+                {
+                    TriggerEventService.TriggerEvent(triggerEvent);
+                }
+
+                if (_parameter.RewardToPlayers.Length > 0)
+                {
+                    WorldServer.SendToAllClients(new ClientItemRewardMessage{Items = _parameter.RewardToPlayers});
                 }
             }
 

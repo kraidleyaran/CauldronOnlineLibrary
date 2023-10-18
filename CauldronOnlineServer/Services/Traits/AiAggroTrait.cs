@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.ObjectParameters;
 using CauldronOnlineCommon.Data.Traits;
+using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Requests;
 using CauldronOnlineServer.Services.Combat;
 using CauldronOnlineServer.Services.Zones;
@@ -26,6 +27,7 @@ namespace CauldronOnlineServer.Services.Traits
         private string[] _applyOnAggro = new string[0];
         private float _diagonalCost = 0f;
         private AggroType _aggroType = AggroType.Aggressive;
+        private bool _healOnAggroLoss = false;
 
         private ConcurrentQueue<AggroRequest> _aggroRequests = new ConcurrentQueue<AggroRequest>();
 
@@ -44,6 +46,7 @@ namespace CauldronOnlineServer.Services.Traits
                 _applyOnAggro = aggroData.ApplyOnAggro;
                 _diagonalCost = aggroData.DiagonalCost;
                 _aggroType = aggroData.AggroType;
+                _healOnAggroLoss = aggroData.HealOnAggroLoss;
             }
         }
 
@@ -383,6 +386,7 @@ namespace CauldronOnlineServer.Services.Traits
                             _currentTarget = string.Empty;
                             _currentPath.Clear();
                             _lastTargetTile = null;
+
                             if (_aiState == AiState.Aggro)
                             {
                                 this.SendMessageTo(new SetAiStateMessage { State = AiState.Idle }, _parent);
@@ -395,6 +399,8 @@ namespace CauldronOnlineServer.Services.Traits
                         if (_aiState == AiState.Aggro)
                         {
                             this.SendMessageTo(new SetAiStateMessage { State = AiState.Idle }, _parent);
+
+
                         }
                     }
                     else
@@ -452,6 +458,11 @@ namespace CauldronOnlineServer.Services.Traits
                     }
                     _appliedTraits = new WorldTrait[0];
                 }
+
+                if (_healOnAggroLoss)
+                {
+                    this.SendMessageTo(FullHealMessage.INSTANCE, _parent);
+                }
             }
             else if (prevState != AiState.Aggro && _aiState == AiState.Aggro && _appliedTraits.Length <= 0)
             {
@@ -470,6 +481,8 @@ namespace CauldronOnlineServer.Services.Traits
 
                     _appliedTraits = applied.ToArray();
                 }
+                
+
             }
         }
 

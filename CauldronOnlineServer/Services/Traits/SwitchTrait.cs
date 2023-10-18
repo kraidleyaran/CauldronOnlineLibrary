@@ -46,6 +46,10 @@ namespace CauldronOnlineServer.Services.Traits
             if (msg.Signal < _parameter.Signals.Length)
             {
                 _parameter.CurrentSignal = msg.Signal;
+                if (_parameter.LockOnInteract)
+                {
+                    _parameter.Locked = true;
+                }
             }
 
             if (!msg.IsEvent)
@@ -53,10 +57,10 @@ namespace CauldronOnlineServer.Services.Traits
                 var zone = ZoneService.GetZoneById(_parent.Data.Id);
                 if (zone != null)
                 {
-                    zone.EventManager.RegisterEvent(new SwitchSignalEvent{TargetId = _parent.Data.Id, Signal = _parameter.CurrentSignal});
+                    zone.EventManager.RegisterEvent(new SwitchSignalEvent{TargetId = _parent.Data.Id, Signal = _parameter.CurrentSignal, Locked = _parameter.Locked});
                 }
             }
-
+            _parent.RefreshParameters();
             this.SendMessageWithFilter(new UpdateSignalMessage{Signal = _parameter.CurrentSignal}, _filter);
         }
 

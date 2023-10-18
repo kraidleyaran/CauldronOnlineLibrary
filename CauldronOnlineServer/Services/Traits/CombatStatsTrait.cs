@@ -48,7 +48,10 @@ namespace CauldronOnlineServer.Services.Traits
             var totalStats = _baseStats + _bonusStats;
             _combatVitals.Health = totalStats.Health;
             _combatVitals.Mana = totalStats.Mana;
-            _parent.AddParameter(new CombatStatsParameter{Stats = totalStats, Vitals = _combatVitals, Monster = _destroyOnDeath});
+            _parameter.Stats = totalStats;
+            _parameter.Vitals = _combatVitals;
+            _parameter.Monster = _destroyOnDeath;
+            _parent.AddParameter(_parameter);
             _parent.AddParameter(new ObjectDeathParameter());
             SubscribeToMessages();
         }
@@ -70,6 +73,7 @@ namespace CauldronOnlineServer.Services.Traits
             _parent.SubscribeWithFilter<ObjectDeathMessage>(ObjectDeath, _id);
             _parent.SubscribeWithFilter<QueryCombatVitalsMessage>(QueryCombatVitals, _id);
             _parent.SubscribeWithFilter<HealMessage>(Heal, _id);
+            _parent.SubscribeWithFilter<FullHealMessage>(FullHeal, _id);
         }
 
         private void TakeDamage(TakeDamageMessage msg)
@@ -124,6 +128,20 @@ namespace CauldronOnlineServer.Services.Traits
             }
             _parent.AddParameter(_parameter);
 
+        }
+
+        private void FullHeal(FullHealMessage msg)
+        {
+            var combined = _baseStats + _bonusStats;
+            _combatVitals.Health = combined.Health;
+            _combatVitals.Mana = combined.Mana;
+            _parameter.Vitals = _combatVitals;
+
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
+            {
+                zone.EventManager.RegisterEvent(new HealEvent {OwnerId = _parent.ZoneId, TargetId = _parent.ZoneId });
+            }
         }
     }
 }

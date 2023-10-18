@@ -209,5 +209,15 @@ namespace CauldronOnlineServer
                 _instance._server.Send(connectionId, data);
             }
         }
+
+        public static void SendToAllClients<T>(T message) where T : ClientMessage
+        {
+            var clients = ClientService.GetAllClients();
+            var data = message.ToByteArray();
+            foreach (var client in clients)
+            {
+                _instance._server.Send(client, data);
+            }
+        }
     }
 }

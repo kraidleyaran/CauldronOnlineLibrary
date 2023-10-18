@@ -67,6 +67,8 @@
     <Compile Include="Data\Combat\DamageType.cs" />
     <Compile Include="Data\Combat\HitboxData.cs" />
     <Compile Include="Data\Combat\SecondaryStats.cs" />
+    <Compile Include="Data\Items\ItemRecipeData.cs" />
+    <Compile Include="Data\Items\RestrictedShopItemData.cs" />
     <Compile Include="Data\Items\WorldItemStackData.cs" />
     <Compile Include="Data\Items\LootRollData.cs" />
     <Compile Include="Data\Items\LootTableData.cs" />
@@ -74,10 +76,12 @@
     <Compile Include="Data\Math\WorldIntRange.cs" />
     <Compile Include="Data\Math\WorldVector2Int.cs" />
     <Compile Include="Data\ObjectParameters\ObjectParameter.cs" />
-    <Compile Include="Data\OnSwitchSignalData.cs" />
+    <Compile Include="Data\Switches\OnMultiSwitchSignalData.cs" />
+    <Compile Include="Data\Switches\OnSwitchSignalData.cs" />
     <Compile Include="Data\Quests\EliminateQuestObjectiveData.cs" />
     <Compile Include="Data\Quests\QuestObjectiveData.cs" />
     <Compile Include="Data\Quests\QuestObjectiveType.cs" />
+    <Compile Include="Data\Switches\RequiredSwitchSignal.cs" />
     <Compile Include="Data\Traits\AiAbilityManagerTraitData.cs" />
     <Compile Include="Data\Traits\AiAggroTraitData.cs" />
     <Compile Include="Data\Traits\AiMovementTraitData.cs" />
@@ -86,6 +90,7 @@
     <Compile Include="Data\Traits\ApplyMovementSpeedTraitData.cs" />
     <Compile Include="Data\Traits\ChargeTraitData.cs" />
     <Compile Include="Data\Traits\CombatStatsTraitData.cs" />
+    <Compile Include="Data\Traits\CrafterTraitData.cs" />
     <Compile Include="Data\Traits\DialogueTraitData.cs" />
     <Compile Include="Data\Traits\DoorTraitData.cs" />
     <Compile Include="Data\Traits\GroupSpawnerTraitData.cs" />
@@ -95,17 +100,21 @@
     <Compile Include="Data\Traits\LootChestTraitData.cs" />
     <Compile Include="Data\Traits\LootTraitData.cs" />
     <Compile Include="Data\Traits\MonsterExperienceTraitData.cs" />
+    <Compile Include="Data\Traits\MultiSwitchSignalReceiverTraitData.cs" />
     <Compile Include="Data\Traits\ObjectSpawnerTraitData.cs" />
     <Compile Include="Data\Traits\SetDoorStateTraitData.cs" />
+    <Compile Include="Data\Traits\SetObjectActiveStateTraitData.cs" />
     <Compile Include="Data\Traits\ShopTraitData.cs" />
     <Compile Include="Data\Traits\SpawnObjectTraitData.cs" />
     <Compile Include="Data\Traits\SpriteTraitData.cs" />
     <Compile Include="Data\Traits\SwitchSignalReceiverTraitData.cs" />
     <Compile Include="Data\Traits\TerrainTraitData.cs" />
     <Compile Include="Data\Traits\TimerTraitData.cs" />
+    <Compile Include="Data\Traits\ToggleObjectStateTraitData.cs" />
     <Compile Include="Data\Traits\TriggerEventReceiverTraitData.cs" />
     <Compile Include="Data\Traits\WorldTraitData.cs" />
     <Compile Include="Data\Traits\ZoneQuestTraitData.cs" />
+    <Compile Include="Data\Traits\ZoneTransitionTraitData.cs" />
     <Compile Include="Data\TriggerEvents\TriggerEventData.cs" />
     <Compile Include="Data\WorldEvent.cs" />
     <Compile Include="Data\WorldTick.cs" />
@@ -121,6 +130,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"C:\CauldronOnlineServer\copy libraries to client.bat"</PostBuildEvent>

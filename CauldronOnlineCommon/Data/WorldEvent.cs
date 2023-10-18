@@ -195,6 +195,7 @@ namespace CauldronOnlineCommon.Data.WorldEvents
         public const int ID = 16;
         public override int EventId => ID;
         public int Signal { get; set; }
+        public bool Locked { get; set; }
         public string TargetId { get; set; }
     }
 
@@ -245,5 +246,25 @@ namespace CauldronOnlineCommon.Data.WorldEvents
         public string Item { get; set; }
         public int Stack { get; set; }
         public WorldVector2Int Position { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ObjectStateEvent : WorldEvent
+    {
+        public const int ID = 22;
+        public override int EventId => ID;
+        public string TargetId { get; set; }
+        public bool Active { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class BridgeStateEvent : WorldEvent
+    {
+        public const int ID = 23;
+        public override int EventId => ID;
+        public bool Active { get; set; }
+        public string TargetId { get; set; }
     }
 }

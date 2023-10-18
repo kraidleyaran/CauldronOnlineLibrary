@@ -50,6 +50,11 @@ namespace CauldronOnlineServer.Services.Zones.Managers
             return _reversePlayerLookup.ContainsKey(objectId);
         }
 
+        public bool DoesObjectExist(string objectId)
+        {
+            return _objects.ContainsKey(objectId);
+        }
+
         public WorldObject[] GetPlayersInZone()
         {
             var playerIds = _reversePlayerLookup.Keys.ToArray();
@@ -75,15 +80,15 @@ namespace CauldronOnlineServer.Services.Zones.Managers
             _destroyObjectRequests.Enqueue(new DestroyObjectRequest(id, playerId, action));
         }
 
-        public void RequestObject(string displayName, string[] traits, bool showName, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient, bool instant = false, bool showAppearance = false)
+        public void RequestObject(string displayName, string[] traits, bool showName, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient, bool instant = false, bool showAppearance = false, bool startActive = true)
         {
             if (instant)
             {
-                GenerateObject(displayName, traits, showName, parameters, position, isMonster, doAfter, showOnClient, showAppearance);
+                GenerateObject(displayName, traits, showName, parameters, position, isMonster, doAfter, showOnClient, showAppearance, startActive);
             }
             else
             {
-                _createObjectRequests.Enqueue(new CreateObjectRequest(displayName, traits, showName, parameters, position, isMonster, doAfter, showOnClient, showAppearance));
+                _createObjectRequests.Enqueue(new CreateObjectRequest(displayName, traits, showName, parameters, position, isMonster, doAfter, showOnClient, showAppearance, startActive));
             }
             
         }
@@ -147,7 +152,7 @@ namespace CauldronOnlineServer.Services.Zones.Managers
 
         }
 
-        private void GenerateObject(string displayName, string[] traits, bool showName, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient, bool showAppearance)
+        private void GenerateObject(string displayName, string[] traits, bool showName, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient, bool showAppearance, bool startActive)
         {
             var id = GenerateId();
             var zone = ZoneService.GetZoneById(_zoneId);
@@ -178,6 +183,7 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                 obj.ShowOnClient = showOnClient;
                 obj.Data.IsMonster = isMonster;
                 obj.Data.ShowName = showName;
+                obj.SetObjectState(startActive ? WorldObjectState.Active : WorldObjectState.Disabled);
                 if (obj.ShowOnClient)
                 {
                     zone.EventManager.RegisterEvent(new ObjectCreatedEvent { Data = obj.Data, ShowAppearance = showAppearance});
@@ -234,6 +240,24 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                             obj.AddTrait(new ZoneQuestTrait(zoneQuest));
                         }
                         break;
+                    case ZoneTransitionParameter.TYPE:
+                        if (parameter is ZoneTransitionParameter zoneTransition)
+                        {
+                            obj.AddTrait(new ZoneTransitionTrait(zoneTransition));
+                        }
+                        break;
+                    case CrafterParameter.TYPE:
+                        if (parameter is CrafterParameter crafter)
+                        {
+                            obj.AddTrait(new CrafterTrait(crafter));
+                        }
+                        break;
+                    case BridgeParameter.TYPE:
+                        if (parameter is BridgeParameter bridge)
+                        {
+                            obj.AddTrait(new BridgeTrait(bridge));
+                        }
+                        break;
                         
                 }
             }
@@ -276,7 +300,7 @@ namespace CauldronOnlineServer.Services.Zones.Managers
             {
                 while (_createObjectRequests.TryDequeue(out var request))
                 {
-                    GenerateObject(request.DisplayName, request.Traits, request.ShowName, request.Parameters, request.Position, request.IsMonster, request.DoAfter, request.ShowOnClient, request.ShowAppearance);
+                    GenerateObject(request.DisplayName, request.Traits, request.ShowName, request.Parameters, request.Position, request.IsMonster, request.DoAfter, request.ShowOnClient, request.ShowAppearance, request.StartActive);
                 }
             }
         }

@@ -1,5 +1,7 @@
 ﻿using CauldronOnlineCommon.Data;
+using CauldronOnlineCommon.Data.Switches;
 using CauldronOnlineCommon.Data.Traits;
+using CauldronOnlineServer.Services.TriggerEvents;
 using CauldronOnlineServer.Services.Zones;
 using ConcurrentMessageBus;
 
@@ -40,6 +42,15 @@ namespace CauldronOnlineServer.Services.Traits
                 {
                     _parent.AddTrait(trait);
                 }
+
+                if (data.ApplyEventsOnSignal.Length > 0)
+                {
+                    foreach (var triggerEvent in data.ApplyEventsOnSignal)
+                    {
+                        TriggerEventService.TriggerEvent(triggerEvent);
+                    }
+                }
+
             }
         }
     }

@@ -14,5 +14,6 @@ namespace CauldronOnlineCommon.Data
         public byte[][] Parameters = new byte[0][];
         public bool IsMonster = false;
         public bool ShowName = false;
+        public bool Active = true;
     }
 }

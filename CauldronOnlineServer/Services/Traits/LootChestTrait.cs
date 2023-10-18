@@ -49,15 +49,18 @@ namespace CauldronOnlineServer.Services.Traits
             if (!_open)
             {
                 _parameter.Open = true;
-                var lootTable = ItemService.GetLootTable(_parameter.LootTable);
-                if (lootTable != null)
+                var zone = ZoneService.GetZoneById(_parent.ZoneId);
+                if (zone != null)
                 {
-                    var zone = ZoneService.GetZoneById(_parent.ZoneId);
-                    if (zone != null)
+                    zone.EventManager.RegisterEvent(new ChestOpenEvent { TargetId = _parent.Data.Id });
+                    var lootTable = ItemService.GetLootTable(_parameter.LootTable);
+                    if (lootTable != null)
                     {
-                        zone.EventManager.RegisterEvent(new SpawnLootEvent { Drops = _parameter.Drops, LootTable = lootTable, Position = _parent.Data.Position, OwnerId = _parent.Data.Id});
+                        zone.EventManager.RegisterEvent(new SpawnLootEvent { Drops = _parameter.Drops, LootTable = lootTable, Position = _parent.Data.Position, OwnerId = _parent.Data.Id });
                     }
                 }
+                
+                
 
                 if (_parameter.RefillChest)
                 {
@@ -69,6 +72,7 @@ namespace CauldronOnlineServer.Services.Traits
                     _destroyTimer = new TickTimer(_parameter.DestroyTicks, 0, _parent.ZoneId);
                     _destroyTimer.OnComplete += DestroyChest;
                 }
+                _parent.RefreshParameters();
                 base.OpenChest();
             }
 

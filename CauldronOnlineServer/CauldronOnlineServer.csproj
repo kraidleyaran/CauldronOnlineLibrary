@@ -82,6 +82,7 @@
     <Compile Include="Services\Traits\AiStateTrait.cs" />
     <Compile Include="Services\Traits\AiWanderTrait.cs" />
     <Compile Include="Services\Traits\ApplyMovementSpeedTrait.cs" />
+    <Compile Include="Services\Traits\BridgeTrait.cs" />
     <Compile Include="Services\Traits\ChargeTrait.cs" />
     <Compile Include="Services\Traits\ChestTrait.cs" />
     <Compile Include="Services\Traits\CombatStatsTrait.cs" />
@@ -95,10 +96,12 @@
     <Compile Include="Services\Traits\LootChestTrait.cs" />
     <Compile Include="Services\Traits\LootTrait.cs" />
     <Compile Include="Services\Traits\MonsterExperienceTrait.cs" />
+    <Compile Include="Services\Traits\MultiSwitchSignalReceiverTrait.cs" />
     <Compile Include="Services\Traits\ObjectSpawnerTrait.cs" />
     <Compile Include="Services\Traits\PlayerMovementTrait.cs" />
     <Compile Include="Services\Traits\PlayerTrait.cs" />
     <Compile Include="Services\Traits\SetDoorStateTrait.cs" />
+    <Compile Include="Services\Traits\SetObjectActiveStateTrait.cs" />
     <Compile Include="Services\Traits\ShopTrait.cs" />
     <Compile Include="Services\Traits\SpawnedObjectTrait.cs" />
     <Compile Include="Services\Traits\SpawnObjectTrait.cs" />
@@ -107,11 +110,14 @@
     <Compile Include="Services\Traits\SwitchTrait.cs" />
     <Compile Include="Services\Traits\TerrainTrait.cs" />
     <Compile Include="Services\Traits\TimerTrait.cs" />
+    <Compile Include="Services\Traits\ToggleObjectStateTrait.cs" />
     <Compile Include="Services\Traits\TraitService.cs" />
+    <Compile Include="Services\Traits\CrafterTrait.cs" />
     <Compile Include="Services\Traits\TriggerEventHitboxTrait.cs" />
     <Compile Include="Services\Traits\TriggerEventReceiverTrait.cs" />
     <Compile Include="Services\Traits\WorldTrait.cs" />
     <Compile Include="Services\Traits\ZoneQuestTrait.cs" />
+    <Compile Include="Services\Traits\ZoneTransitionTrait.cs" />
     <Compile Include="Services\TriggerEvents\TriggerEvent.cs" />
     <Compile Include="Services\TriggerEvents\TriggerEventService.cs" />
     <Compile Include="Services\WorldService.cs" />

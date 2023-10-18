@@ -1,4 +1,5 @@
-﻿using CauldronOnlineCommon.Data.ObjectParameters;
+﻿using System.Collections.Generic;
+using CauldronOnlineCommon.Data.ObjectParameters;
 using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Services.Items;
@@ -11,6 +12,8 @@ namespace CauldronOnlineServer.Services.Traits
     public class DoorTrait : WorldTrait
     {
         private DoorParameter _doorParameter = new DoorParameter();
+
+        private List<string> _triggeredEvents = new List<string>();
 
         public DoorTrait(DoorParameter doorParameter)
         {
@@ -28,6 +31,7 @@ namespace CauldronOnlineServer.Services.Traits
                 _doorParameter.Rotation = door.Rotation;
                 _doorParameter.TriggerEvents = door.TriggerEvents;
                 _doorParameter.AllowOpenWithNoItems = door.AllowOpenWithNoItems;
+                _doorParameter.TrappedSpawnPosition = door.TrappedSpawnPosition;
             }
         }
 
@@ -51,7 +55,7 @@ namespace CauldronOnlineServer.Services.Traits
             {
                 foreach (var triggerEvent in _doorParameter.TriggerEvents)
                 {
-                    this.SubscribeWithFilter<ZoneEventTriggerMessage>(ZoneEventTrigger, TriggerEventService.GetFilter(_parent.ZoneId, triggerEvent));
+                    this.SubscribeWithFilter<ZoneEventTriggerMessage>(msg => ZoneEventTrigger(msg, triggerEvent), TriggerEventService.GetFilter(_parent.ZoneId, triggerEvent));
                 }
             }
         }
@@ -59,7 +63,7 @@ namespace CauldronOnlineServer.Services.Traits
         private void SetDoorState(SetDoorStateMessage msg)
         {
             _doorParameter.Open = msg.Open;
-            _parent.AddParameter(_doorParameter);
+            _parent.RefreshParameters();
             if (!msg.IsEvent)
             {
                 var zone = ZoneService.GetZoneById(_parent.ZoneId);
@@ -78,22 +82,32 @@ namespace CauldronOnlineServer.Services.Traits
             }
         }
 
-        private void ZoneEventTrigger(ZoneEventTriggerMessage msg)
+        private void ZoneEventTrigger(ZoneEventTriggerMessage msg, string triggerEvent)
         {
-            _doorParameter.Open = !_doorParameter.Open;
-            var zone = ZoneService.GetZoneById(_parent.ZoneId);
-            if (zone != null)
+            if (!_doorParameter.RequireAllEvents && !_triggeredEvents.Contains(triggerEvent))
             {
-                if (_doorParameter.Open)
-                {
-                    zone.RemoveBlockedTile(_parent.Tile.Position, _parent);
-                }
-                else
-                {
-                    zone.SetBlockedTile(_parent.Tile.Position, _parent);
-                }
-                zone.EventManager.RegisterEvent(new DoorEvent { Open = _doorParameter.Open, OwnerId = _parent.Data.Id, TargetId = _parent.Data.Id });
+                _triggeredEvents.Add(triggerEvent);
             }
+
+            if (!_doorParameter.RequireAllEvents || _triggeredEvents.Count == _doorParameter.TriggerEvents.Length)
+            {
+                _doorParameter.Open = !_doorParameter.Open;
+                _parent.RefreshParameters();
+                var zone = ZoneService.GetZoneById(_parent.ZoneId);
+                if (zone != null)
+                {
+                    if (_doorParameter.Open)
+                    {
+                        zone.RemoveBlockedTile(_parent.Tile.Position, _parent);
+                    }
+                    else
+                    {
+                        zone.SetBlockedTile(_parent.Tile.Position, _parent);
+                    }
+                    zone.EventManager.RegisterEvent(new DoorEvent { Open = _doorParameter.Open, OwnerId = _parent.Data.Id, TargetId = _parent.Data.Id });
+                }
+            }
+
         }
 
         private void DoorCheck(DoorCheckMessage msg)
@@ -130,6 +144,7 @@ namespace CauldronOnlineServer.Services.Traits
                         }
                     }
                     _doorParameter.Open = true;
+                    _parent.RefreshParameters();
                     var zone = ZoneService.GetZoneById(_parent.ZoneId);
                     if (zone != null)
                     {

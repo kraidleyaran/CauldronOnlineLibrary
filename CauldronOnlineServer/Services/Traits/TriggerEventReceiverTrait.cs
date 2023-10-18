@@ -1,4 +1,6 @@
-﻿using CauldronOnlineCommon.Data.Traits;
+﻿using System.Collections.Generic;
+using System.Linq;
+using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineServer.Services.TriggerEvents;
 using CauldronOnlineServer.Services.Zones;
 using ConcurrentMessageBus;
@@ -9,6 +11,9 @@ namespace CauldronOnlineServer.Services.Traits
     {
         private string[] _applyOnTriggerEvent = new string[0];
         private string[] _triggerEvents = new string[0];
+        private bool _requireAllEvents = false;
+
+        private List<string> _triggeredEvents = new List<string>();
 
         public TriggerEventReceiverTrait(WorldTraitData data) : base(data)
         {
@@ -16,6 +21,7 @@ namespace CauldronOnlineServer.Services.Traits
             {
                 _applyOnTriggerEvent = triggerEvent.ApplyOnTriggerEvent;
                 _triggerEvents = triggerEvent.TriggerEvents;
+                _requireAllEvents = triggerEvent.RequireAllEvents;
             }
         }
 
@@ -29,17 +35,26 @@ namespace CauldronOnlineServer.Services.Traits
         {
             foreach (var triggerEvent in _triggerEvents)
             {
-                this.SubscribeWithFilter<ZoneEventTriggerMessage>(ZoneEventTrigger, TriggerEventService.GetFilter(_parent.ZoneId, triggerEvent));
+                this.SubscribeWithFilter<ZoneEventTriggerMessage>(msg => ZoneEventTrigger(triggerEvent), TriggerEventService.GetFilter(_parent.ZoneId, triggerEvent));
             }
         }
 
-        private void ZoneEventTrigger(ZoneEventTriggerMessage msg)
+        private void ZoneEventTrigger(string triggerEvent)
         {
-            var traits = TraitService.GetWorldTraits(_applyOnTriggerEvent);
-            foreach (var trait in traits)
+            if (_requireAllEvents && !_triggeredEvents.Contains(triggerEvent))
             {
-                _parent.AddTrait(trait, _parent);
+                _triggeredEvents.Add(triggerEvent);
             }
+
+            if (!_requireAllEvents || _triggeredEvents.Count == _triggerEvents.Length)
+            {
+                var traits = TraitService.GetWorldTraits(_applyOnTriggerEvent);
+                foreach (var trait in traits)
+                {
+                    _parent.AddTrait(trait, _parent);
+                }
+            }
+
         }
     }
 }

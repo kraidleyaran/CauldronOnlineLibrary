@@ -105,6 +105,7 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public const string TYPE = "Shop";
         public override string Type => TYPE;
         public ShopItemData[] Items { get; set; }
+        public RestrictedShopItemData[] Restricted { get; set; }
         public HitboxData Hitbox { get; set; }
     }
 
@@ -139,7 +140,10 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public HitboxData Hitbox { get; set; }
         public float Rotation { get; set; }
         public string[] TriggerEvents { get; set; }
+        public bool RequireAllEvents { get; set; }
         public bool AllowOpenWithNoItems { get; set; }
+        public WorldVector2Int TrappedSpawnPosition { get; set; }
+        
     }
 
     [Serializable]
@@ -162,6 +166,9 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public HitboxData Hitbox { get; set; }
         public string[] Signals { get; set; }
         public int CurrentSignal { get; set; }
+        public bool Locked { get; set; }
+        public bool LockOnInteract { get; set; }
+        public bool CombatInteractable { get; set; }
     }
 
     [Serializable]
@@ -201,9 +208,11 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public override string Type => TYPE;
         public bool Open { get; set; }
         public WorldItemStackData Item { get; set; }
+        public WorldItemStackData[] RewardToPlayers { get; set; }
         public string OpenSprite { get; set; }
         public string ClosedSprite { get; set; }
         public HitboxData Hitbox { get; set; }
+        public string[] ApplyEventsOnOpen { get; set; }
     }
 
     [Serializable]
@@ -215,10 +224,44 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public string Name { get; set; }
         public QuestObjectiveData[] Objectives { get; set; }
         public int Range { get; set; }
+        public bool UsePov { get; set; }
         public string[] ApplyOnComplete { get; set; }
         public string[] TriggerEventOnComplete { get; set; }
         public bool ResetQuest { get; set; }
         public WorldIntRange ResetTicks { get; set; }
+        public string SpawnEvent { get; set; }
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class ZoneTransitionParameter : ObjectParameter
+    {
+        public const string TYPE = "ZoneTransition";
+        public override string Type => TYPE;
+        public string Zone { get; set; }
+        public WorldVector2Int Position { get; set; }
+        public float Rotation { get; set; }
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class CrafterParameter : ObjectParameter
+    {
+        public const string TYPE = "Crafter";
+        public override string Type => TYPE;
+        public ItemRecipeData[] Recipes { get; set; }
+        public HitboxData Hitbox { get; set; }
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class BridgeParameter : ObjectParameter
+    {
+        public const string TYPE = "Bridge";
+        public override string Type => TYPE;
+        public string TilemapSprite { get; set; }
+        public WorldVector2Int Size { get; set; }
+        public bool Active { get; set; }
     }
 
 

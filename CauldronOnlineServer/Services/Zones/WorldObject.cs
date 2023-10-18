@@ -74,13 +74,13 @@ namespace CauldronOnlineServer.Services.Zones
                 _parameters.Add(parameter.Type, existing);
             }
 
-            Data.Parameters = _parameters.Values.Select(p => p.ToParameterData()).ToArray();
+            RefreshParameters();
         }
 
         public void RemoveParameter(string type)
         {
             _parameters.Remove(type);
-            Data.Parameters = _parameters.Values.Select(p => p.ToParameterData()).ToArray();
+            RefreshParameters();
         }
 
         public T GetParamter<T>(string type) where T : ObjectParameter
@@ -93,11 +93,17 @@ namespace CauldronOnlineServer.Services.Zones
             return null;
         }
 
+        public void RefreshParameters()
+        {
+            Data.Parameters = _parameters.Values.Select(p => p.ToParameterData()).ToArray();
+        }
+
         public void SetObjectState(WorldObjectState state)
         {
             if (State != state)
             {
                 State = state;
+                Data.Active = State != WorldObjectState.Disabled && State != WorldObjectState.Destroying && State != WorldObjectState.Destroyed;
                 this.SendMessageTo(ObjectStateUpdatedMessage.INSTANCE, this);
             }
         }

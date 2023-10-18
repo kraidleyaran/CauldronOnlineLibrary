@@ -13,5 +13,6 @@ namespace CauldronOnlineCommon.Data.Zones
         public bool ShowOnClient;
         public bool ShowNameOnClient;
         public bool ShowAppearance;
+        public bool StartActive;
     }
 }

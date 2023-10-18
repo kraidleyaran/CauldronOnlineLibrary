@@ -16,8 +16,11 @@ namespace CauldronOnlineServer.Services.Traits
         private QuestObjective[] _questObjectives = new QuestObjective[0];
         private ZoneQuestParameter _parameter = new ZoneQuestParameter();
         private bool _completed = false;
+        private bool _started = false;
 
         private TickTimer _resetTimer = null;
+
+        
 
         public ZoneQuestTrait(WorldTraitData data) : base(data)
         {
@@ -29,6 +32,8 @@ namespace CauldronOnlineServer.Services.Traits
                 _parameter.Range = zoneQuest.Range;
                 _parameter.ResetQuest = zoneQuest.ResetQuest;
                 _parameter.ResetTicks = zoneQuest.ResetTicks;
+                _parameter.UsePov = zoneQuest.UsePov;
+                _parameter.SpawnEvent = zoneQuest.SpawnEvent;
             }
         }
 
@@ -42,21 +47,27 @@ namespace CauldronOnlineServer.Services.Traits
         {
             base.Setup(parent, sender);
             _questObjectives = QuestService.GetObjectives(_parameter.Objectives);
-            StartQuest();
             SubscribeToMessages();
+            if (string.IsNullOrEmpty(_parameter.SpawnEvent))
+            {
+                StartQuest();
+            }
         }
 
         private void StartQuest()
         {
-            foreach (var objective in _questObjectives)
+            _completed = false;
+            _started = true;
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
             {
-                var zone = ZoneService.GetZoneById(_parent.ZoneId);
-                if (zone != null)
+                var tiles = _parameter.UsePov ? zone.GetTilesInPovArea(_parent.Tile, _parameter.Range) : zone.GetTilesInSquareArea(_parent.Tile, _parameter.Range);
+                foreach (var objective in _questObjectives)
                 {
-                    var tiles = zone.GetTilesInPovArea(_parent.Tile, _parameter.Range);
                     objective.SpawnRequiredObjects(zone, tiles, _parent, Name);
                 }
             }
+
         }
 
         private void ResetTimerFinished()
@@ -70,6 +81,10 @@ namespace CauldronOnlineServer.Services.Traits
         private void SubscribeToMessages()
         {
             _parent.SubscribeWithFilter<ApplyObjectiveItemCompletetionMessage>(ApplyObjectiveItemCompletetion, _id);
+            if (!string.IsNullOrEmpty(_parameter.SpawnEvent))
+            {
+                this.SubscribeWithFilter<ZoneEventTriggerMessage>(ZoneEventTrigger, TriggerEventService.GetFilter(_parent.ZoneId, _parameter.SpawnEvent));
+            }
         }
 
         private void ApplyObjectiveItemCompletetion(ApplyObjectiveItemCompletetionMessage msg)
@@ -84,6 +99,7 @@ namespace CauldronOnlineServer.Services.Traits
                     {
                         WorldServer.Log("Quest Completed");
                         _completed = true;
+                        _started = false;
                         var traits = TraitService.GetWorldTraits(_parameter.ApplyOnComplete);
                         foreach (var trait in traits)
                         {
@@ -102,6 +118,14 @@ namespace CauldronOnlineServer.Services.Traits
                         }
                     }
                 }
+            }
+        }
+
+        private void ZoneEventTrigger(ZoneEventTriggerMessage msg)
+        {
+            if (!_started)
+            {
+                StartQuest();
             }
         }
     }

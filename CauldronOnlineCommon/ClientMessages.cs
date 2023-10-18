@@ -370,4 +370,26 @@ namespace CauldronOnlineCommon
         public WorldTick Tick { get; set; }
     }
 
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientItemRewardMessage : ClientMessage
+    {
+        public const int ID = 34;
+        public override int MessageId => ID;
+        public WorldItemStackData[] Items { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientProjectileMovementUpdateMessage : ClientMessage
+    {
+        public const int ID = 35;
+        public override int MessageId => ID;
+        public string TargetId { get; set; }
+        public WorldVector2Int Position { get; set; }
+        public int Speed { get; set; }
+        public WorldTick Tick { get; set; }
+    }
+
+
 }
