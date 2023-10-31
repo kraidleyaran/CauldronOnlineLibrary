@@ -10,5 +10,6 @@ namespace CauldronOnlineCommon.Data.Traits
         public override string Type => TYPE;
 
         public ApplyHitboxData[] Hitboxes;
+        
     }
 }

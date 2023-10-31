@@ -40,7 +40,7 @@ namespace CauldronOnlineServer.Services.Traits
                 var zone = ZoneService.GetZoneById(_parent.ZoneId);
                 if (zone != null)
                 {
-                    zone.EventManager.RegisterEvent(new SpawnLootEvent { LootTable = lootTable, OwnerId = _parent.Data.Id, Position = _parent.Data.Position, Drops = _drops });
+                    zone.EventManager.RegisterEvent(new SpawnLootEvent { LootTable = lootTable, OwnerId = _parent.Data.Id, Position = _parent.Data.Position, Drops = _drops, IsMonster = true});
                 }
             }
             

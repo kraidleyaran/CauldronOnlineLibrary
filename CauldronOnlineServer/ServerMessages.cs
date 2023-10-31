@@ -196,11 +196,13 @@ namespace CauldronOnlineServer
     {
         public int Signal;
         public bool IsEvent;
+        public bool OverrideLock;
     }
 
     public class UpdateSignalMessage : EventMessage
     {
         public int Signal;
+        public string SwitchName;
     }
 
     public class DoorCheckMessage : EventMessage
@@ -210,7 +212,7 @@ namespace CauldronOnlineServer
 
     public class OpenChestMessage : EventMessage
     {
-        public static OpenChestMessage INSTANCE = new OpenChestMessage();
+        public string Player;
     }
 
     public class SetFaceDirectionMessage : EventMessage
@@ -243,5 +245,30 @@ namespace CauldronOnlineServer
     {
         public bool Active { get; set; }
         public bool IsEvent { get; set; }
+    }
+
+    public class SetSwitchLockStateMessage : EventMessage
+    {
+        public bool Locked;
+    }
+
+    public class AdvanceSwitchSignalMessage : EventMessage
+    {
+        public static AdvanceSwitchSignalMessage INSTANCE = new AdvanceSwitchSignalMessage();
+    }
+
+    public class SetOwnerIdMessage : EventMessage
+    {
+        public string Id;
+    }
+
+    public class RemoveOwnerIdMessage : EventMessage
+    {
+        public string Id;
+    }
+
+    public class QueryOwnerIdMessage : EventMessage
+    {
+        public Action<string> DoAfter;
     }
 }

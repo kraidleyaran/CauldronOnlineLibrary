@@ -8,6 +8,7 @@ using CauldronOnlineCommon.Data.Math;
 using CauldronOnlineCommon.Data.ObjectParameters;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Requests;
+using CauldronOnlineServer.Services.SystemEvents;
 using CauldronOnlineServer.Services.Traits;
 using ConcurrentMessageBus;
 
@@ -70,7 +71,7 @@ namespace CauldronOnlineServer.Services.Zones.Managers
             return returnObjects.ToArray();
         }
 
-        public void RequestPlayerObject(ClientCharacterData data, WorldVector2Int position, int connectionId, string worldId, Action<string, string, WorldVector2Int> doAfter)
+        public void RequestPlayerObject(ClientCharacterData data, WorldVector2Int position, int connectionId, string worldId, Action<string, string, string, WorldVector2Int> doAfter)
         {
             _createPlayerRequests.Enqueue(new CreatePlayerObjectRequest(data, position, connectionId, worldId, doAfter));
         }
@@ -137,17 +138,19 @@ namespace CauldronOnlineServer.Services.Zones.Managers
 
                 var tile = zone.GetTileByWorldPosition(pos);
                 var obj = new WorldObject(id, request.Data.DisplayName, pos, tile, _zoneId)
-                { ShowOnClient = true };
-                obj.Data.ShowName = true;
+                {
+                    ShowOnClient = true,
+                    Data = {ShowName = true}
+                };
                 obj.AddTrait(new SpriteTrait(request.Data.Sprite));
-                obj.AddTrait(new PlayerTrait(request.ConnectionId, request.WorldId));
+                obj.AddTrait(new PlayerTrait(request.ConnectionId, request.WorldId, request.Data.Colors));
                 obj.AddTrait(new CombatStatsTrait(request.Data.Stats, request.Data.Vitals));
                 obj.AddTrait(new PlayerMovementTrait(request.WorldId));
                 _objects.Add(obj.Data.Id, obj);
                 _playerIdLookup.Add(request.WorldId, id);
                 _reversePlayerLookup.Add(id, request.WorldId);
                 zone.EventManager.RegisterEvent(new ObjectCreatedEvent{Data = obj.Data, ShowAppearance = true});
-                request.DoAfter?.Invoke(id, zone.Name, pos);
+                request.DoAfter?.Invoke(id, request.Data.DisplayName, zone.Name, pos);
             }
 
         }
@@ -256,6 +259,12 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                         if (parameter is BridgeParameter bridge)
                         {
                             obj.AddTrait(new BridgeTrait(bridge));
+                        }
+                        break;
+                    case DelayedSpawnParameter.TYPE:
+                        if (parameter is DelayedSpawnParameter delayed)
+                        {
+                            obj.AddTrait(new DelayedSpawnTrait(delayed));
                         }
                         break;
                         

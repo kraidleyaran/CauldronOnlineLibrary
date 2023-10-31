@@ -53,6 +53,7 @@ namespace CauldronOnlineServer.Services.Zones.Managers
             CurrentTick++;
             if (CurrentTick >= TotalTicks)
             {
+                CurrentTick -= TotalTicks;
                 OnLoopFinish?.Invoke();
                 if (TotalLoops >= 0)
                 {

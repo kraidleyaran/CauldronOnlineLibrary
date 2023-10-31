@@ -14,6 +14,7 @@ using CauldronOnlineServer.Services.Combat;
 using CauldronOnlineServer.Services.Commands;
 using CauldronOnlineServer.Services.Items;
 using CauldronOnlineServer.Services.Quests;
+using CauldronOnlineServer.Services.SystemEvents;
 using CauldronOnlineServer.Services.Traits;
 using CauldronOnlineServer.Services.TriggerEvents;
 using CauldronOnlineServer.Services.Zones;
@@ -46,6 +47,7 @@ namespace CauldronOnlineServer
             _logging = new WorldLogging($"{_settings.BaseFolder}{Path.DirectorySeparatorChar}{_settings.LogSubFolder}");
             _services = new WorldService[]
             {
+                new SystemEventService(),
                 new ClientService(),
                 new RNGService(),
                 new QuestService(),

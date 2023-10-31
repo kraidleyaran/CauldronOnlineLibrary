@@ -4,6 +4,7 @@ using CauldronOnlineCommon;
 using CauldronOnlineCommon.Data.Math;
 using CauldronOnlineServer.Interfaces;
 using CauldronOnlineServer.Services.Combat;
+using CauldronOnlineServer.Services.SystemEvents;
 using CauldronOnlineServer.Services.Zones;
 using ConcurrentMessageBus;
 
@@ -28,8 +29,9 @@ namespace CauldronOnlineServer.Services.Client
             this.SubscribeWithFilter<ClientPingMessage>(ClientPing, WorldId);
         }
 
-        private void OnObjectCreated(string id, string zone, WorldVector2Int pos)
+        private void OnObjectCreated(string id, string displayName, string zone, WorldVector2Int pos)
         {
+            SystemEventService.SendMessage($"{displayName} has joined the world");
             WorldServer.SendToClient(new ClientCreateCharacterResultMessage{Success = true, ObjectId = id, Zone = zone, Position = pos}, ConnectionId);
         }
 
@@ -42,7 +44,7 @@ namespace CauldronOnlineServer.Services.Client
                 zone = ZoneService.DefaultZone;
                 pos = zone.DefaultSpawn;
             }
-            zone.ObjectManager.RequestPlayerObject(msg.Data,pos, ConnectionId, WorldId, OnObjectCreated);
+            zone.ObjectManager.RequestPlayerObject(msg.Data, pos, ConnectionId, WorldId, OnObjectCreated);
         }
 
         private void ClientWorldSettingsRequest(ClientWorldSettingsRequestMessage msg)

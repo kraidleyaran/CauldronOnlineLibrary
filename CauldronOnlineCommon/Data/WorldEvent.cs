@@ -133,6 +133,7 @@ namespace CauldronOnlineCommon.Data.WorldEvents
         public WorldVector2Int Position { get; set; }
         public LootTableData LootTable { get; set; }
         public WorldIntRange Drops { get; set; }
+        public bool IsMonster { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptOut)]
@@ -215,6 +216,7 @@ namespace CauldronOnlineCommon.Data.WorldEvents
         public const int ID = 18;
         public override int EventId => ID;
         public string TargetId { get; set; }
+        public string PlayerName { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptOut)]
@@ -245,6 +247,7 @@ namespace CauldronOnlineCommon.Data.WorldEvents
         public string TargetId { get; set; }
         public string Item { get; set; }
         public int Stack { get; set; }
+        public string PlayerName { get; set; }
         public WorldVector2Int Position { get; set; }
     }
 
@@ -266,5 +269,44 @@ namespace CauldronOnlineCommon.Data.WorldEvents
         public override int EventId => ID;
         public bool Active { get; set; }
         public string TargetId { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class TimerEvent : WorldEvent
+    {
+        public const int ID = 24;
+        public override int EventId => ID;
+        public string TargetId { get; set; }
+        public WorldVector2Int Position { get; set; }
+        public int Ticks { get; set; }
+        public int Loops { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class MovableEvent : WorldEvent
+    {
+        public const int ID = 25;
+        public override int EventId => ID;
+        public string OwnerId { get; set; }
+        public string MovableId { get; set; }
+        public MovableType Type { get; set; }
+        public WorldVector2Int OwnerPosition { get; set; }
+        public WorldVector2Int MovablePosition { get; set; }
+        public int Speed { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class RollEvent : WorldEvent
+    {
+        public const int ID = 26;
+        public override int EventId => ID;
+        public string OwnerId { get; set; }
+        public int Speed { get; set; }
+        public WorldVector2Int Position { get; set; }
+        public WorldVector2Int Direction { get; set; }
+        public bool Finished { get; set; }
     }
 }

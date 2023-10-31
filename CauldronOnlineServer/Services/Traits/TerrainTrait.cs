@@ -15,6 +15,7 @@ namespace CauldronOnlineServer.Services.Traits
             if (data is TerrainTraitData terrainData)
             {
                 _parameter.Hitbox = terrainData.Hitbox;
+                _parameter.IsGround = terrainData.IsGround;
             }
         }
 

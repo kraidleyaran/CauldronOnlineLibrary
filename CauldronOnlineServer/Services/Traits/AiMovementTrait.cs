@@ -21,8 +21,6 @@ namespace CauldronOnlineServer.Services.Traits
 
         private WorldVector2Int _direction = WorldVector2Int.Zero;
 
-        //private ObjectPathParameter _pathParameter = new ObjectPathParameter();
-
         public AiMovementTrait(WorldTraitData data) : base(data)
         {
             if (data is AiMovementTraitData movementData)
@@ -34,7 +32,7 @@ namespace CauldronOnlineServer.Services.Traits
         public override void Setup(WorldObject parent, object sender)
         {
             base.Setup(parent, sender);
-            //_parent.AddParameter(_pathParameter);
+            _parent.AddParameter(new MovementParameter());
             SubscribeToMessages();
         }
 

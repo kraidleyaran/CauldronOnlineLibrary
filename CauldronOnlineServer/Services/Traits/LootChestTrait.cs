@@ -44,7 +44,7 @@ namespace CauldronOnlineServer.Services.Traits
             _parent.AddParameter(_parameter);
         }
 
-        public override bool OpenChest()
+        public override bool OpenChest(string player)
         {
             if (!_open)
             {
@@ -59,8 +59,6 @@ namespace CauldronOnlineServer.Services.Traits
                         zone.EventManager.RegisterEvent(new SpawnLootEvent { Drops = _parameter.Drops, LootTable = lootTable, Position = _parent.Data.Position, OwnerId = _parent.Data.Id });
                     }
                 }
-                
-                
 
                 if (_parameter.RefillChest)
                 {
@@ -73,7 +71,7 @@ namespace CauldronOnlineServer.Services.Traits
                     _destroyTimer.OnComplete += DestroyChest;
                 }
                 _parent.RefreshParameters();
-                base.OpenChest();
+                base.OpenChest(player);
             }
 
             return _open;

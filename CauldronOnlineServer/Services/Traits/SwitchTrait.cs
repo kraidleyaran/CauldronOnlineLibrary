@@ -39,14 +39,16 @@ namespace CauldronOnlineServer.Services.Traits
         private void SubscribeToMessages()
         {
             _parent.SubscribeWithFilter<SetSwitchSignalMessage>(SetSwitchSignal, _filter);
+            _parent.SubscribeWithFilter<SetSwitchLockStateMessage>(SetSwitchLockState, _filter);
+            _parent.SubscribeWithFilter<AdvanceSwitchSignalMessage>(AdvanceSwitchSignal, _filter);
         }
 
         private void SetSwitchSignal(SetSwitchSignalMessage msg)
         {
-            if (msg.Signal < _parameter.Signals.Length)
+            if ((!_parameter.Locked || msg.OverrideLock) && msg.Signal < _parameter.Signals.Length)
             {
                 _parameter.CurrentSignal = msg.Signal;
-                if (_parameter.LockOnInteract)
+                if (!msg.OverrideLock && _parameter.LockOnInteract)
                 {
                     _parameter.Locked = true;
                 }
@@ -61,7 +63,34 @@ namespace CauldronOnlineServer.Services.Traits
                 }
             }
             _parent.RefreshParameters();
-            this.SendMessageWithFilter(new UpdateSignalMessage{Signal = _parameter.CurrentSignal}, _filter);
+            this.SendMessageWithFilter(new UpdateSignalMessage{Signal = _parameter.CurrentSignal, SwitchName = _parameter.Name}, _filter);
+        }
+
+        private void SetSwitchLockState(SetSwitchLockStateMessage msg)
+        {
+            _parameter.Locked = msg.Locked;
+            _parent.RefreshParameters();
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
+            {
+                zone.EventManager.RegisterEvent(new SwitchSignalEvent { TargetId = _parent.Data.Id, Signal = _parameter.CurrentSignal, Locked = _parameter.Locked });
+            }
+        }
+
+        private void AdvanceSwitchSignal(AdvanceSwitchSignalMessage msg)
+        {
+            _parameter.CurrentSignal++;
+            if (_parameter.CurrentSignal >= _parameter.Signals.Length)
+            {
+                _parameter.CurrentSignal = 0;
+            }
+            _parent.RefreshParameters();
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
+            {
+                zone.EventManager.RegisterEvent(new SwitchSignalEvent { TargetId = _parent.Data.Id, Signal = _parameter.CurrentSignal, Locked = _parameter.Locked });
+            }
+            this.SendMessageWithFilter(new UpdateSignalMessage { Signal = _parameter.CurrentSignal, SwitchName = _parameter.Name }, _filter);
         }
 
         public override void Destroy()

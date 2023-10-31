@@ -18,7 +18,7 @@ namespace CauldronOnlineServer.Services.Traits
 
         }
 
-        public virtual bool OpenChest()
+        public virtual bool OpenChest(string player)
         {
             if (!_open)
             {
@@ -38,9 +38,9 @@ namespace CauldronOnlineServer.Services.Traits
             _parent.SubscribeWithFilter<OpenChestMessage>(OpenChest, _id);
         }
 
-        private void OpenChest(OpenChestMessage msg)
+        protected internal virtual void OpenChest(OpenChestMessage msg)
         {
-            OpenChest();
+            OpenChest(msg.Player);
         }
     }
 }

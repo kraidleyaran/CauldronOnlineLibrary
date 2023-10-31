@@ -9,6 +9,7 @@ namespace CauldronOnlineCommon.Data
     {
         public string DisplayName;
         public string Sprite;
+        public SpriteColorData Colors;
         public CombatStats Stats;
         public CombatVitals Vitals;
     }

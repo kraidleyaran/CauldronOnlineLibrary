@@ -39,24 +39,24 @@ namespace CauldronOnlineServer.Services.Traits
         {
             foreach (var signal in _requiredSignals.Keys)
             {
-                this.SubscribeWithFilter<UpdateSignalMessage>(msg => UpdateSignal(msg, signal), SwitchTrait.GenerateFilter(signal, _parent.ZoneId));
+                this.SubscribeWithFilter<UpdateSignalMessage>(UpdateSignal, SwitchTrait.GenerateFilter(signal, _parent.ZoneId));
             }
         }
 
-        private void UpdateSignal(UpdateSignalMessage msg, string switchSignal)
+        private void UpdateSignal(UpdateSignalMessage msg)
         {
-            if (_requiredSignals.TryGetValue(switchSignal, out var required))
+            if (_requiredSignals.TryGetValue(msg.SwitchName, out var required))
             {
                 if (required == msg.Signal)
                 {
-                    if (!_matchingSignals.Contains(switchSignal))
+                    if (!_matchingSignals.Contains(msg.SwitchName))
                     {
-                        _matchingSignals.Add(switchSignal);
+                        _matchingSignals.Add(msg.SwitchName);
                     }
                 }
-                else if (_matchingSignals.Contains(switchSignal))
+                else if (_matchingSignals.Contains(msg.SwitchName))
                 {
-                    _matchingSignals.Remove(switchSignal);
+                    _matchingSignals.Remove(msg.SwitchName);
                 }
 
                 if (_matchingSignals.Count == _requiredSignals.Count)

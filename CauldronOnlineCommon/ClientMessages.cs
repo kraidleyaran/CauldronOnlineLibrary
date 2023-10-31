@@ -327,6 +327,7 @@ namespace CauldronOnlineCommon
         public override int MessageId => ID;
         public string TargetId { get; set; }
         public int Signal { get; set; }
+        public bool Locked { get; set; }
         public WorldTick Tick { get; set; }
     }
 
@@ -390,6 +391,53 @@ namespace CauldronOnlineCommon
         public int Speed { get; set; }
         public WorldTick Tick { get; set; }
     }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientSystemEventMessage : ClientMessage
+    {
+        public const int ID = 36;
+        public override int MessageId => ID;
+        public byte[] SystemEvent { get; set; }
+    }
+
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientPlayerLeveledMessage : ClientMessage
+    {
+        public const int ID = 37;
+        public override int MessageId => ID;
+        public int Level { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientMovableUpdateMessage : ClientMessage
+    {
+        public const int ID = 38;
+        public override int MessageId => ID;
+        public MovableType Type { get; set; }
+        public string MovableId { get; set; }
+        public WorldVector2Int Position { get; set; }
+        public WorldVector2Int MovablePosition { get; set; }
+        public int MoveSpeed { get; set; }
+        public WorldTick Tick { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientRollUpdateMessage : ClientMessage
+    {
+        public const int ID = 39;
+        public override int MessageId => ID;
+        public WorldVector2Int Position { get; set; }
+        public WorldVector2Int Direction { get; set; }
+        public int MoveSpeed { get; set; }
+        public bool Finished { get; set; }
+        public WorldTick Tick { get; set; }
+    }
+
 
 
 }

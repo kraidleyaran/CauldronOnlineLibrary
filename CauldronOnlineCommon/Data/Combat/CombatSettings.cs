@@ -22,6 +22,7 @@ namespace CauldronOnlineCommon.Data.Combat
         public float PathChangeAggro;
         public float DamageAggro;
         public float CriticalStrikeDamagePercent;
+        public int GlobalReApplyTicks;
 
         public int CalculateDamageResist(DamageType type, CombatStats stats)
         {

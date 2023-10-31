@@ -75,6 +75,8 @@
     <Compile Include="Services\Quests\QuestObjective.cs" />
     <Compile Include="Services\Quests\QuestService.cs" />
     <Compile Include="Services\RNGService.cs" />
+    <Compile Include="Services\SystemEvents\SystemEventService.cs" />
+    <Compile Include="Services\Traits\AdvanceSwitchSignalTrait.cs" />
     <Compile Include="Services\Traits\AiAbilityManagerTrait.cs" />
     <Compile Include="Services\Traits\AiAggroTrait.cs" />
     <Compile Include="Services\Traits\AiMovementTrait.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Services\Traits\ChargeTrait.cs" />
     <Compile Include="Services\Traits\ChestTrait.cs" />
     <Compile Include="Services\Traits\CombatStatsTrait.cs" />
+    <Compile Include="Services\Traits\DelayedSpawnTrait.cs" />
     <Compile Include="Services\Traits\DialogueTrait.cs" />
     <Compile Include="Services\Traits\DoorTrait.cs" />
     <Compile Include="Services\Traits\EliminateObjectiveTrait.cs" />
@@ -96,12 +99,15 @@
     <Compile Include="Services\Traits\LootChestTrait.cs" />
     <Compile Include="Services\Traits\LootTrait.cs" />
     <Compile Include="Services\Traits\MonsterExperienceTrait.cs" />
+    <Compile Include="Services\Traits\MovableTrait.cs" />
     <Compile Include="Services\Traits\MultiSwitchSignalReceiverTrait.cs" />
     <Compile Include="Services\Traits\ObjectSpawnerTrait.cs" />
     <Compile Include="Services\Traits\PlayerMovementTrait.cs" />
     <Compile Include="Services\Traits\PlayerTrait.cs" />
     <Compile Include="Services\Traits\SetDoorStateTrait.cs" />
     <Compile Include="Services\Traits\SetObjectActiveStateTrait.cs" />
+    <Compile Include="Services\Traits\SetSwitchLockStateTrait.cs" />
+    <Compile Include="Services\Traits\SetSwitchSignalTrait.cs" />
     <Compile Include="Services\Traits\ShopTrait.cs" />
     <Compile Include="Services\Traits\SpawnedObjectTrait.cs" />
     <Compile Include="Services\Traits\SpawnObjectTrait.cs" />
@@ -115,6 +121,7 @@
     <Compile Include="Services\Traits\CrafterTrait.cs" />
     <Compile Include="Services\Traits\TriggerEventHitboxTrait.cs" />
     <Compile Include="Services\Traits\TriggerEventReceiverTrait.cs" />
+    <Compile Include="Services\Traits\WalledTrait.cs" />
     <Compile Include="Services\Traits\WorldTrait.cs" />
     <Compile Include="Services\Traits\ZoneQuestTrait.cs" />
     <Compile Include="Services\Traits\ZoneTransitionTrait.cs" />

@@ -170,7 +170,7 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                                     {
                                         if (zone.ObjectManager.TryGetObjectById(chest.TargetId, out var obj))
                                         {
-                                            obj.SendMessageTo(OpenChestMessage.INSTANCE, obj);
+                                            obj.SendMessageTo(new OpenChestMessage{Player = chest.PlayerName},  obj);
                                         }
                                     }
                                     break;
@@ -180,6 +180,44 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                                         if (zone.ObjectManager.TryGetObjectById(teleport.ObjectId, out var obj))
                                         {
                                             obj.SetPosition(teleport.Position);
+                                        }
+                                    }
+                                    break;
+                                case MovableEvent.ID:
+                                    if (worldEvent is MovableEvent movable)
+                                    {
+                                        if (zone.ObjectManager.TryGetObjectById(movable.OwnerId, out var player) && zone.ObjectManager.TryGetObjectById(movable.MovableId, out var movableObj))
+                                        {
+
+                                            switch (movable.Type)
+                                            {
+                                                case MovableType.Grab:
+                                                    var ownerId = string.Empty;
+                                                    var queryOwnerIdMsg = new QueryOwnerIdMessage();
+                                                    queryOwnerIdMsg.DoAfter = id => ownerId = id;
+                                                    this.SendMessageTo(queryOwnerIdMsg, movableObj);
+
+                                                    if (string.IsNullOrEmpty(ownerId))
+                                                    {
+                                                        player.SendMessageTo(new SetOwnerIdMessage { Id = movable.OwnerId }, movableObj);
+                                                    }
+                                                    break;
+                                                case MovableType.Release:
+                                                    player.SendMessageTo(new RemoveOwnerIdMessage { Id = movable.OwnerId }, movableObj);
+                                                    break;
+                                            }
+                                            player.SetPosition(movable.OwnerPosition);
+                                            movableObj.SetPosition(movable.MovablePosition);
+
+                                        }
+                                    }
+                                    break;
+                                case RollEvent.ID:
+                                    if (worldEvent is RollEvent roll)
+                                    {
+                                        if (zone.ObjectManager.TryGetObjectById(roll.OwnerId, out var obj))
+                                        {
+                                            obj.SetPosition(roll.Position);
                                         }
                                     }
                                     break;

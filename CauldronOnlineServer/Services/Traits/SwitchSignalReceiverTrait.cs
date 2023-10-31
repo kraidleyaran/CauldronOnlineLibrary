@@ -1,4 +1,5 @@
-﻿using CauldronOnlineCommon.Data;
+﻿using System.Linq;
+using CauldronOnlineCommon.Data;
 using CauldronOnlineCommon.Data.Switches;
 using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineServer.Services.TriggerEvents;
@@ -29,13 +30,14 @@ namespace CauldronOnlineServer.Services.Traits
         {
             foreach (var switchSignal in _onSignal)
             {
-                this.SubscribeWithFilter<UpdateSignalMessage>(msg => UpdateSignal(msg.Signal, switchSignal), SwitchTrait.GenerateFilter(switchSignal.Switch, _parent.ZoneId));
+                this.SubscribeWithFilter<UpdateSignalMessage>(UpdateSignal, SwitchTrait.GenerateFilter(switchSignal.Switch, _parent.ZoneId));
             }
         }
 
-        private void UpdateSignal(int signal, OnSwitchSignalData data)
+        private void UpdateSignal(UpdateSignalMessage msg)
         {
-            if (data.Signal == signal)
+            var data = _onSignal.FirstOrDefault(d => d.Switch == msg.SwitchName);
+            if (data != null && data.Signal == msg.Signal)
             {
                 var traits = TraitService.GetWorldTraits(data.ApplyOnSignal);
                 foreach (var trait in traits)

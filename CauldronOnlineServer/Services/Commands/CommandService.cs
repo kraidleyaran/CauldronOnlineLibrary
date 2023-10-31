@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CauldronOnlineCommon;
+using CauldronOnlineServer.Services.SystemEvents;
 using CauldronOnlineServer.Services.Zones;
 
 namespace CauldronOnlineServer.Services.Commands
@@ -16,6 +18,7 @@ namespace CauldronOnlineServer.Services.Commands
             {"commands",  Commands },
             {"?",  Commands },
             {"setdefaultzone",  SetDefaultZone },
+            {"say", Say}
         };
 
         public override string Name => NAME;
@@ -65,6 +68,15 @@ namespace CauldronOnlineServer.Services.Commands
             {
                 _instance.Log("Usage: setdefaultzone [zone] - Alias can be used in place of [zone]");
             }
+        }
+
+        private static void Say(string[] args)
+        {
+            if (args.Length > 0)
+            {
+                SystemEventService.SendMessage(args.ToSingleLineString());
+            }
+            
         }
     }
 }

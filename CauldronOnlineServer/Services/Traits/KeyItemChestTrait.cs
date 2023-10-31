@@ -4,6 +4,7 @@ using CauldronOnlineCommon.Data.ObjectParameters;
 using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Services.Items;
+using CauldronOnlineServer.Services.SystemEvents;
 using CauldronOnlineServer.Services.TriggerEvents;
 using CauldronOnlineServer.Services.Zones;
 
@@ -38,7 +39,7 @@ namespace CauldronOnlineServer.Services.Traits
             _parent.AddParameter(_parameter);
         }
 
-        public override bool OpenChest()
+        public override bool OpenChest(string playerName)
         {
             if (!_open)
             {
@@ -48,7 +49,7 @@ namespace CauldronOnlineServer.Services.Traits
                 if (zone != null)
                 {
                     zone.EventManager.RegisterEvent(new ChestOpenEvent{TargetId = _parent.Data.Id});
-                    zone.EventManager.RegisterEvent(new KeyItemLootEvent{Position = _parent.Data.Position, Item = _parameter.Item.Item, Stack = _parameter.Item.Stack, TargetId = _parent.Data.Id});                    
+                    zone.EventManager.RegisterEvent(new KeyItemLootEvent{Position = _parent.Data.Position, Item = _parameter.Item.Item, Stack = _parameter.Item.Stack, TargetId = _parent.Data.Id, PlayerName = playerName});                    
                 }
 
                 foreach (var triggerEvent in _parameter.ApplyEventsOnOpen)

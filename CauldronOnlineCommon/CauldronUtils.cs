@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
+using CauldronOnlineCommon.Data;
 using CauldronOnlineCommon.Data.ObjectParameters;
 using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.WorldEvents;
@@ -99,6 +100,14 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<ClientItemRewardMessage>(json, _settings);
                 case ClientProjectileMovementUpdateMessage.ID:
                     return JsonConvert.DeserializeObject<ClientProjectileMovementUpdateMessage>(json, _settings);
+                case ClientSystemEventMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientSystemEventMessage>(json, _settings);
+                case ClientPlayerLeveledMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientPlayerLeveledMessage>(json, _settings);
+                case ClientMovableUpdateMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientMovableUpdateMessage>(json, _settings);
+                case ClientRollUpdateMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientRollUpdateMessage>(json, _settings);
             }
         }
 
@@ -154,6 +163,12 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<ObjectStateEvent>(json, _settings);
                 case BridgeStateEvent.ID:
                     return JsonConvert.DeserializeObject<BridgeStateEvent>(json, _settings);
+                case TimerEvent.ID:
+                    return JsonConvert.DeserializeObject<TimerEvent>(json, _settings);
+                case MovableEvent.ID:
+                    return JsonConvert.DeserializeObject<MovableEvent>(json, _settings);
+                case RollEvent.ID:
+                    return JsonConvert.DeserializeObject<RollEvent>(json, _settings);
                 default:
                     return original;
             }
@@ -205,10 +220,24 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<CrafterParameter>(json, _settings);
                 case BridgeParameter.TYPE:
                     return JsonConvert.DeserializeObject<BridgeParameter>(json, _settings);
+                case PlayerParameter.TYPE:
+                    return JsonConvert.DeserializeObject<PlayerParameter>(json, _settings);
+                case MovableParameter.TYPE:
+                    return JsonConvert.DeserializeObject<MovableParameter>(json, _settings);
+                case WalledParameter.TYPE:
+                    return JsonConvert.DeserializeObject<WalledParameter>(json, _settings);
+                case MovementParameter.TYPE:
+                    return JsonConvert.DeserializeObject<MovementParameter>(json, _settings);
                 default:
                     return original;
             }
 
+        }
+
+        public static SystemEvent GenerateSystemEvent(this byte[] data)
+        {
+            var json = Encoding.UTF8.GetString(data, 0, data.Length);
+            return JsonConvert.DeserializeObject<SystemEvent>(json);
         }
 
         public static byte[] ToData<T>(this T worldEvent) where T : WorldEvent
@@ -226,6 +255,12 @@ namespace CauldronOnlineCommon
         public static byte[] ToByteArray<T>(this T msg) where T : ClientMessage
         {
             var json = JsonConvert.SerializeObject(msg, _settings);
+            return Encoding.UTF8.GetBytes(json);
+        }
+
+        public static byte[] ToEventData<T>(this T systemEvent) where T : SystemEvent
+        {
+            var json = JsonConvert.SerializeObject(systemEvent);
             return Encoding.UTF8.GetBytes(json);
         }
 
@@ -308,6 +343,24 @@ namespace CauldronOnlineCommon
             }
 
             return string.Empty;
+        }
+
+        public static string ToSingleLineString(this string[] strings)
+        {
+            var returnString = string.Empty;
+            foreach (var str in strings)
+            {
+                if (string.IsNullOrEmpty(returnString))
+                {
+                    returnString = str;
+                }
+                else
+                {
+                    returnString = $"{returnString} {str}";
+                }
+            }
+
+            return returnString;
         }
     }
 }

@@ -4,12 +4,13 @@ using CauldronOnlineCommon.Data.Combat;
 namespace CauldronOnlineCommon.Data.Traits
 {
     [Serializable]
-    public class TerrainTraitData : WorldTraitData
+    public class WalledTraitData : WorldTraitData
     {
-        public const string TYPE = "Terrain";
+        public const string TYPE = "Walled";
         public override string Type => TYPE;
 
         public HitboxData Hitbox;
-        public bool IsGround;
+        public bool IgnoreGround;
+        public bool CheckForPlayer;
     }
 }

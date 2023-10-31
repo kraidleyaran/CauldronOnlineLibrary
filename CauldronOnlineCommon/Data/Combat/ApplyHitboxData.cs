@@ -7,5 +7,6 @@ namespace CauldronOnlineCommon.Data.Combat
     {
         public string[] ApplyOnServer;
         public string[] ApplyOnClient;
+        public bool ReApply;
     }
 }

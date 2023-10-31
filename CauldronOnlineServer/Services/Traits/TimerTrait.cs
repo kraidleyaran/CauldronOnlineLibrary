@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CauldronOnlineCommon.Data.Traits;
+using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Services.Zones;
 using CauldronOnlineServer.Services.Zones.Managers;
 
@@ -11,6 +12,7 @@ namespace CauldronOnlineServer.Services.Traits
         private string[] _applyOnLoop;
         private int _totalTicks;
         private int _totalLoops;
+        private bool _showOnClient = false;
 
         private TickTimer _timer = null;
 
@@ -24,6 +26,7 @@ namespace CauldronOnlineServer.Services.Traits
                 _applyOnLoop = timerData.ApplyOnLoop;
                 _totalTicks = timerData.TotalTicks;
                 _totalLoops = timerData.TotalLoops;
+                _showOnClient = timerData.ShowOnClient;
             }
         }
 
@@ -48,6 +51,13 @@ namespace CauldronOnlineServer.Services.Traits
             _timer = new TickTimer(_totalTicks, _totalLoops, _parent.ZoneId);
             _timer.OnLoopFinish += LoopFinished;
             _timer.OnComplete += TimerComplete;
+
+            if (_showOnClient)
+            {
+                var zone = ZoneService.GetZoneById(_parent.ZoneId);
+                zone.EventManager.RegisterEvent(new TimerEvent{Ticks = _totalTicks, Loops = _totalLoops, TargetId = _parent.Data.Id, Position = _parent.Data.Position});
+            }
+            
         }
 
         private void LoopFinished()

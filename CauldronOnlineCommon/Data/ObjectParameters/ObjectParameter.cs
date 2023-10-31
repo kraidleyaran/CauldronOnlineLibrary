@@ -3,6 +3,7 @@ using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.Items;
 using CauldronOnlineCommon.Data.Math;
 using CauldronOnlineCommon.Data.Quests;
+using CauldronOnlineCommon.Data.Switches;
 using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.Zones;
 using Newtonsoft.Json;
@@ -116,6 +117,7 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public const string TYPE = "Terrain";
         public override string Type => TYPE;
         public HitboxData Hitbox { get; set; }
+        public bool IsGround { get; set; }
     }
 
     [Serializable]
@@ -262,8 +264,67 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public string TilemapSprite { get; set; }
         public WorldVector2Int Size { get; set; }
         public bool Active { get; set; }
+        public string[] ToggleOnTriggerEvents { get; set; }
+        public RequiredSwitchSignalData[] ToggleOnSwitchSignals { get; set; }
     }
 
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class PlayerParameter : ObjectParameter
+    {
+        public const string TYPE = "Player";
+        public override string Type => TYPE;
+        public SpriteColorData Colors { get; set; }
+    }
 
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class DelayedSpawnParameter : ObjectParameter
+    {
+        public const string TYPE = "DelayedSpawn";
+        public override string Type => TYPE;
+        public int DelayTicks { get; set; }
+        public ZoneSpawnData Spawn { get; set; }
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class MovableParameter : ObjectParameter
+    {
+        public const string TYPE = "Movable";
+        public override string Type => TYPE;
+        public int MoveSpeed { get; set; }
+        public string OwnerId { get; set; }
+        public HitboxData Hitbox { get; set; }
+        public HitboxData HorizontalHitbox { get; set; }
+        public WorldOffset Offset { get; set; }
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class WalledParameter : ObjectParameter
+    {
+        public const string TYPE = "Walled";
+        public override string Type => TYPE;
+        public HitboxData Hitbox { get; set; }
+        public bool IgnoreGround { get; set; }
+        public bool CheckForPlayer { get; set; }
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class MovementParameter : ObjectParameter
+    {
+        public const string TYPE = "Movement";
+        public override string Type => TYPE;
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class MovableHelperParameter : ObjectParameter
+    {
+        public const string TYPE = "MovableHelper";
+        public override string Type => TYPE;
+    }
 
 }

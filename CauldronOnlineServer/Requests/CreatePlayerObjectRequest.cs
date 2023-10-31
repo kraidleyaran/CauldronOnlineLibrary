@@ -12,9 +12,9 @@ namespace CauldronOnlineServer.Requests
 
         public WorldVector2Int Position;
         //Id, Zone, Pos
-        public Action<string, string, WorldVector2Int> DoAfter;
+        public Action<string,string, string, WorldVector2Int> DoAfter;
 
-        public CreatePlayerObjectRequest(ClientCharacterData data, WorldVector2Int position, int connctionId, string worldId, Action<string, string, WorldVector2Int> doAfter)
+        public CreatePlayerObjectRequest(ClientCharacterData data, WorldVector2Int position, int connctionId, string worldId, Action<string, string, string, WorldVector2Int> doAfter)
         {
             Data = data;
             ConnectionId = connctionId;

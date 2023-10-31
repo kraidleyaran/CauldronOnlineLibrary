@@ -122,6 +122,16 @@ namespace CauldronOnlineServer.Services.Traits
                     return new ToggleObjectStateTrait(data);
                 case MultiSwitchSignalReceiverTraitData.TYPE:
                     return new MultiSwitchSignalReceiverTrait(data);
+                case SetSwitchLockStateTraitData.TYPE:
+                    return new SetSwitchLockStateTrait(data);
+                case SetSwitchSignalTraitData.TYPE:
+                    return new SetSwitchSignalTrait(data);
+                case AdvanceSwitchSignalTraitData.TYPE:
+                    return new AdvanceSwitchSignalTrait(data);
+                case MovableTraitData.TYPE:
+                    return new MovableTrait(data);
+                case WalledTraitData.TYPE:
+                    return new WalledTrait(data);
                 default:
                     return new WorldTrait(data);
             }
