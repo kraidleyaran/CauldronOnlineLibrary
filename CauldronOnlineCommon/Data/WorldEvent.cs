@@ -44,9 +44,10 @@ namespace CauldronOnlineCommon.Data.WorldEvents
         public const int ID = 3;
         public override int EventId => ID;
 
-        public string Id { get; set; }
+        public string OwnerId { get; set; }
         public CombatStats Stats { get; set; }
-        public int Health { get; set; }
+        public SecondaryStats Secondary { get; set; }
+        public CombatVitals Vitals { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptOut)]
@@ -308,5 +309,42 @@ namespace CauldronOnlineCommon.Data.WorldEvents
         public WorldVector2Int Position { get; set; }
         public WorldVector2Int Direction { get; set; }
         public bool Finished { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ReturnToOwnerEvent : WorldEvent
+    {
+        public const int ID = 27;
+        public override int EventId => ID;
+        public string OwnerId { get; set; }
+        public string TargetId { get; set; }
+        public int DetectDistance { get; set; }
+        public WorldVector2Int DetectOffset { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class HasReturnedToOwnerEvent : WorldEvent
+    {
+        public const int ID = 28;
+        public override int EventId => ID;
+        public string TargetId { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class PlayerEnteredWorldEvent : WorldEvent
+    {
+        public const int ID = 29;
+        public override int EventId => ID;
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class PlayerLeftWorldEvent : WorldEvent
+    {
+        public const int ID = 30;
+        public override int EventId => ID;
     }
 }

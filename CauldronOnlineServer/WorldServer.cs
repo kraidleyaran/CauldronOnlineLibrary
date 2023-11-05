@@ -13,6 +13,7 @@ using CauldronOnlineServer.Services.Client;
 using CauldronOnlineServer.Services.Combat;
 using CauldronOnlineServer.Services.Commands;
 using CauldronOnlineServer.Services.Items;
+using CauldronOnlineServer.Services.Player;
 using CauldronOnlineServer.Services.Quests;
 using CauldronOnlineServer.Services.SystemEvents;
 using CauldronOnlineServer.Services.Traits;
@@ -57,6 +58,7 @@ namespace CauldronOnlineServer
                 new ZoneService($"{_settings.BaseFolder}{Path.DirectorySeparatorChar}{_settings.ZoneSubFolder}"),
                 new ItemService($"{_settings.BaseFolder}{Path.DirectorySeparatorChar}{_settings.LootTableSubFolder}"),
                 new CommandService(),
+                new PlayerService(),
             };
         }
 

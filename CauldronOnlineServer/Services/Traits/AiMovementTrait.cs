@@ -21,6 +21,8 @@ namespace CauldronOnlineServer.Services.Traits
 
         private WorldVector2Int _direction = WorldVector2Int.Zero;
 
+        private AiState _aiState = AiState.Idle;
+
         public AiMovementTrait(WorldTraitData data) : base(data)
         {
             if (data is AiMovementTraitData movementData)
@@ -47,6 +49,7 @@ namespace CauldronOnlineServer.Services.Traits
             _parent.SubscribeWithFilter<ApplyMovementSpeedMessage>(ApplyMovementSpeed, _id);
             _parent.SubscribeWithFilter<QueryFaceDirectionMessage>(QueryFaceDirection, _id);
             _parent.SubscribeWithFilter<SetFaceDirectionMessage>(SetFaceDirection, _id);
+            _parent.SubscribeWithFilter<UpdateAiStateMessage>(UpdateAiState, _id);
         }
 
         private void SetCurrentPath(SetCurrentPathMessage msg)
@@ -63,7 +66,7 @@ namespace CauldronOnlineServer.Services.Traits
 
         private void ZoneUpdateTick(ZoneUpdateTickMessage msg)
         {
-            if (_parent.State == WorldObjectState.Active && _currentPath.Count > 0 && !_knockbackActive)
+            if (_aiState != AiState.OutOfBounds && _parent.State == WorldObjectState.Active && _currentPath.Count > 0 && !_knockbackActive)
             {
                 var moveTo = _currentPath[0];
                 var moveSpeed = _moveSpeed + _bonusSpeed;
@@ -74,18 +77,19 @@ namespace CauldronOnlineServer.Services.Traits
                     if (zone != null)
                     {
                         _parent.SetPosition(moveToPos);
-                        if (zone.IsValidPosition(moveToPos))
+                        zone.EventManager.RegisterEvent(new MovementEvent { Id = _parent.Data.Id, Position = moveToPos, Speed = moveSpeed });
+                        if (!zone.IsValidPosition(moveToPos))
                         {
-                            zone.EventManager.RegisterEvent(new MovementEvent { Id = _parent.Data.Id, Position = moveToPos, Speed = moveSpeed });
-                        }
-                        else
-                        {
-                            var tile = zone.FindClosestTile(_parent.Tile, moveToPos);
-                            if (tile != null)
+                            if (_aiState != AiState.OutOfBounds)
                             {
-                                _currentPath.Clear();
-                                _parent.Tile = tile;
-                                this.SendMessageTo(ZoneTileUpdatedMessage.INSTANCE, _parent);
+                                this.SendMessageTo(new SetAiStateMessage { State = AiState.OutOfBounds }, _parent);
+                                var tile = zone.FindClosestTile(_parent.Tile, moveToPos);
+                                if (tile != null)
+                                {
+                                    _currentPath.Clear();
+                                    _parent.Tile = tile;
+                                    this.SendMessageTo(ZoneTileUpdatedMessage.INSTANCE, _parent);
+                                }
                             }
                         }
                     }
@@ -102,6 +106,25 @@ namespace CauldronOnlineServer.Services.Traits
                         zone.EventManager.RegisterEvent(new MovementEvent { Id = _parent.Data.Id, Position = moveTo.WorldPosition, Speed = moveSpeed });
                     }
                 }
+            }
+            else if (_parent.State == WorldObjectState.Active && _aiState == AiState.OutOfBounds && !_knockbackActive)
+            {
+                var zone = ZoneService.GetZoneById(_parent.ZoneId);
+                if (zone != null)
+                {
+                    var moveSpeed = _moveSpeed + _bonusSpeed;
+                    var moveToPos = _parent.Data.Position + _parent.Data.Position.Direction(_parent.Tile.Position) * moveSpeed;
+                    _parent.SetPosition(moveToPos);
+                    zone.EventManager.RegisterEvent(new MovementEvent{Position = moveToPos, Speed = moveSpeed, Id = _parent.Data.Id});
+                    var tile = zone.GetTileByWorldPosition(_parent.Data.Position);
+                    if (tile != null)
+                    {
+                        _parent.Tile = tile;
+                        this.SendMessageTo(new SetAiStateMessage{State = AiState.Idle}, _parent);
+                    }
+                }
+
+                
             }
         }
 
@@ -151,6 +174,10 @@ namespace CauldronOnlineServer.Services.Traits
             {
                 _parent.Tile = tile;
                 this.SendMessageTo(ZoneTileUpdatedMessage.INSTANCE, _parent);
+                if (_aiState == AiState.OutOfBounds)
+                {
+                   this.SendMessageTo(new SetAiStateMessage{State = AiState.Idle}, _parent);
+                }
             }
         }
 
@@ -174,6 +201,11 @@ namespace CauldronOnlineServer.Services.Traits
         private void QueryFaceDirection(QueryFaceDirectionMessage msg)
         {
             msg.DoAfter.Invoke(_direction);
+        }
+
+        private void UpdateAiState(UpdateAiStateMessage msg)
+        {
+            _aiState = msg.State;
         }
     }
 }

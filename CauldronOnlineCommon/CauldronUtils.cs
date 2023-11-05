@@ -108,6 +108,18 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<ClientMovableUpdateMessage>(json, _settings);
                 case ClientRollUpdateMessage.ID:
                     return JsonConvert.DeserializeObject<ClientRollUpdateMessage>(json, _settings);
+                case ClientPlayerRosterRequestMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientPlayerRosterRequestMessage>(json, _settings);
+                case ClientPlayerRosterResponseMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientPlayerRosterResponseMessage>(json, _settings);
+                case ClientPlayerRosterUpdateMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientPlayerRosterUpdateMessage>(json, _settings);
+                case ClientReturnToOwnerMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientReturnToOwnerMessage>(json, _settings);
+                case ClientProjectileReturnedMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientProjectileReturnedMessage>(json, _settings);
+                case ClientUpdateCombatStatsMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientUpdateCombatStatsMessage>(json, _settings);
             }
         }
 
@@ -169,6 +181,10 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<MovableEvent>(json, _settings);
                 case RollEvent.ID:
                     return JsonConvert.DeserializeObject<RollEvent>(json, _settings);
+                case ReturnToOwnerEvent.ID:
+                    return JsonConvert.DeserializeObject<ReturnToOwnerEvent>(json, _settings);
+                case HasReturnedToOwnerEvent.ID:
+                    return JsonConvert.DeserializeObject<HasReturnedToOwnerEvent>(json, _settings);
                 default:
                     return original;
             }
@@ -228,6 +244,10 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<WalledParameter>(json, _settings);
                 case MovementParameter.TYPE:
                     return JsonConvert.DeserializeObject<MovementParameter>(json, _settings);
+                case ProjectileRedirectParameter.TYPE:
+                    return JsonConvert.DeserializeObject<ProjectileRedirectParameter>(json, _settings);
+                case BombableDoorParameter.TYPE:
+                    return JsonConvert.DeserializeObject<BombableDoorParameter>(json, _settings);
                 default:
                     return original;
             }
@@ -317,14 +337,16 @@ namespace CauldronOnlineCommon
 
         public static string ToStatString(this int integer, string statName = "")
         {
+            var statNameString = string.IsNullOrEmpty(statName) ? string.Empty : $" {statName}";
             if (integer > 0)
             {
-                return $"{POSITIVE}{integer} {statName}";
+                return $"{POSITIVE}{integer}{statNameString}";
+
             }
 
             if (integer < 0)
             {
-                return $"{NEGATIVE}{integer} {statName}";
+                return $"{NEGATIVE}{integer}{statNameString}";
             }
 
             return string.Empty;
@@ -332,14 +354,15 @@ namespace CauldronOnlineCommon
 
         public static string ToStatString(this float value, string statName = "")
         {
+            var statNameString = string.IsNullOrEmpty(statName) ? string.Empty : $" {statName}";
             if (value > 0)
             {
-                return $"{POSITIVE}{value:P} {statName}";
+                return $"{POSITIVE}{value:P}{statNameString}";
             }
 
             if (value < 0)
             {
-                return $"{NEGATIVE}{value:P} {statName}";
+                return $"{NEGATIVE}{value:P}{statNameString}";
             }
 
             return string.Empty;

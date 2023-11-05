@@ -132,6 +132,12 @@ namespace CauldronOnlineServer.Services.Traits
                     return new MovableTrait(data);
                 case WalledTraitData.TYPE:
                     return new WalledTrait(data);
+                case ProjectileRedirectTraitData.TYPE:
+                    return new ProjectileRedirectTrait(data);
+                case MonsterScalingTraitData.TYPE:
+                    return new MonsterScalingTrait(data);
+                case ApplyCombatStatsTraitData.TYPE:
+                    return new ApplyCombatStatsTrait(data);
                 default:
                     return new WorldTrait(data);
             }

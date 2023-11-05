@@ -369,7 +369,7 @@ namespace CauldronOnlineServer.Services.Traits
                     }
 
 
-                    if (string.IsNullOrEmpty(_currentTarget) || !_aggrod.ContainsKey(_currentTarget))
+                    if (_aiState != AiState.OutOfBounds && (string.IsNullOrEmpty(_currentTarget) || !_aggrod.ContainsKey(_currentTarget)))
                     {
                         if (_aggrod.Count > 0)
                         {
@@ -399,11 +399,9 @@ namespace CauldronOnlineServer.Services.Traits
                         if (_aiState == AiState.Aggro)
                         {
                             this.SendMessageTo(new SetAiStateMessage { State = AiState.Idle }, _parent);
-
-
                         }
                     }
-                    else
+                    else if (_aiState == AiState.Aggro)
                     {
                         var usedAbility = false;
                         if (zone.ObjectManager.TryGetObjectById(_currentTarget, out var target))
@@ -450,18 +448,21 @@ namespace CauldronOnlineServer.Services.Traits
             if (_aiState != AiState.Aggro && _currentPath.Count > 0)
             {
                 _currentPath.Clear();
-                if (_appliedTraits.Length > 0)
+                if (_aiState != AiState.OutOfBounds && _aggrod.Count <= 0)
                 {
-                    foreach (var trait in _appliedTraits)
+                    if (_appliedTraits.Length > 0)
                     {
-                        _parent.RemoveTrait(trait);
+                        foreach (var trait in _appliedTraits)
+                        {
+                            _parent.RemoveTrait(trait);
+                        }
+                        _appliedTraits = new WorldTrait[0];
                     }
-                    _appliedTraits = new WorldTrait[0];
-                }
 
-                if (_healOnAggroLoss)
-                {
-                    this.SendMessageTo(FullHealMessage.INSTANCE, _parent);
+                    if (_healOnAggroLoss)
+                    {
+                        this.SendMessageTo(FullHealMessage.INSTANCE, _parent);
+                    }
                 }
             }
             else if (prevState != AiState.Aggro && _aiState == AiState.Aggro && _appliedTraits.Length <= 0)

@@ -78,6 +78,7 @@
     <Compile Include="Data\Math\WorldVector2Int.cs" />
     <Compile Include="Data\MovableType.cs" />
     <Compile Include="Data\ObjectParameters\ObjectParameter.cs" />
+    <Compile Include="Data\RegisteredPlayerData.cs" />
     <Compile Include="Data\SpriteColorData.cs" />
     <Compile Include="Data\Switches\OnMultiSwitchSignalData.cs" />
     <Compile Include="Data\Switches\OnSwitchSignalData.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Data\Traits\AiMovementTraitData.cs" />
     <Compile Include="Data\Traits\AiStateTraitData.cs" />
     <Compile Include="Data\Traits\AiWanderTraitData.cs" />
+    <Compile Include="Data\Traits\ApplyCombatStatsTraitData.cs" />
     <Compile Include="Data\Traits\ApplyMovementSpeedTraitData.cs" />
     <Compile Include="Data\Traits\ChargeTraitData.cs" />
     <Compile Include="Data\Traits\CombatStatsTraitData.cs" />
@@ -107,9 +109,11 @@
     <Compile Include="Data\Traits\LootChestTraitData.cs" />
     <Compile Include="Data\Traits\LootTraitData.cs" />
     <Compile Include="Data\Traits\MonsterExperienceTraitData.cs" />
+    <Compile Include="Data\Traits\MonsterScalingTraitData.cs" />
     <Compile Include="Data\Traits\MovableTraitData.cs" />
     <Compile Include="Data\Traits\MultiSwitchSignalReceiverTraitData.cs" />
     <Compile Include="Data\Traits\ObjectSpawnerTraitData.cs" />
+    <Compile Include="Data\Traits\ProjectileRedirectTraitData.cs" />
     <Compile Include="Data\Traits\SetDoorStateTraitData.cs" />
     <Compile Include="Data\Traits\SetObjectActiveStateTraitData.cs" />
     <Compile Include="Data\Traits\SetSwitchLockStateTraitData.cs" />

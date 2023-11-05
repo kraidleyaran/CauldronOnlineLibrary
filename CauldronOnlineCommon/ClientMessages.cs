@@ -46,6 +46,7 @@ namespace CauldronOnlineCommon
         public override int MessageId => ID;
         public bool Success { get; set; }
         public string Message { get; set; }
+        public string PlayerId { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptOut)]
@@ -438,6 +439,66 @@ namespace CauldronOnlineCommon
         public WorldTick Tick { get; set; }
     }
 
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientPlayerRosterRequestMessage : ClientMessage
+    {
+        public const int ID = 40;
+        public override int MessageId => ID;
+    }
 
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientPlayerRosterResponseMessage : ClientMessage
+    {
+        public const int ID = 41;
+        public override int MessageId => ID;
+        public RegisteredPlayerData[] Players { get; set; }
+        public bool Success { get; set; }
+        public string Message { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientPlayerRosterUpdateMessage : ClientMessage
+    {
+        public const int ID = 42;
+        public override int MessageId => ID;
+        public RegisteredPlayerData Player { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientReturnToOwnerMessage : ClientMessage
+    {
+        public const int ID = 43;
+        public override int MessageId => ID;
+        public string TargetId { get; set; }
+        public int DetectDistance { get; set; }
+        public WorldVector2Int DetectOffset { get; set; }
+        public WorldTick Tick { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientProjectileReturnedMessage : ClientMessage
+    {
+        public const int ID = 44;
+        public override int MessageId => ID;
+        public string TargetId { get; set; }
+        public WorldTick Tick { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientUpdateCombatStatsMessage : ClientMessage
+    {
+        public const int ID = 45;
+        public override int MessageId => ID;
+        public CombatStats Stats { get; set; }
+        public SecondaryStats Secondary { get; set; }
+        public CombatVitals Vitals { get; set; }
+        public WorldTick Tick { get; set; }
+    }
 
 }

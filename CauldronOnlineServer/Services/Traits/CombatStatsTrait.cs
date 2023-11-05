@@ -1,4 +1,5 @@
 ﻿using System;
+using CauldronOnlineCommon;
 using CauldronOnlineCommon.Data;
 using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.ObjectParameters;
@@ -74,6 +75,8 @@ namespace CauldronOnlineServer.Services.Traits
             _parent.SubscribeWithFilter<QueryCombatVitalsMessage>(QueryCombatVitals, _id);
             _parent.SubscribeWithFilter<HealMessage>(Heal, _id);
             _parent.SubscribeWithFilter<FullHealMessage>(FullHeal, _id);
+            _parent.SubscribeWithFilter<SetCombatStatsMessage>(SetCombatStats, _id);
+            _parent.SubscribeWithFilter<ApplyCombatStatsMessage>(ApplyCombatStats, _id);
         }
 
         private void TakeDamage(TakeDamageMessage msg)
@@ -86,15 +89,7 @@ namespace CauldronOnlineServer.Services.Traits
                 {
                     this.SendMessageTo(new ObjectDeathMessage{OwnerId = _parent.Data.Id}, _parent);
                 }
-                else
-                {
-                    var parameter = _parent.GetParamter<CombatStatsParameter>(CombatStatsParameter.TYPE);
-                    if (parameter != null)
-                    {
-                        parameter.Vitals = _combatVitals;
-                    }
-                }
-                _parent.AddParameter(_parameter);
+                _parent.RefreshParameters();
             }
 
         }
@@ -141,6 +136,54 @@ namespace CauldronOnlineServer.Services.Traits
             if (zone != null)
             {
                 zone.EventManager.RegisterEvent(new HealEvent {OwnerId = _parent.ZoneId, TargetId = _parent.ZoneId });
+            }
+        }
+
+        private void SetCombatStats(SetCombatStatsMessage msg)
+        {
+            _combatVitals = msg.Vitals;
+            _baseStats = msg.Stats;
+            _bonusSecondary = msg.Secondary;
+            _parameter.Stats = _baseStats + _bonusStats;
+            _parameter.Vitals = _combatVitals;
+            _parameter.BonusSecondary = _bonusSecondary;
+            _parent.RefreshParameters();
+        }
+
+        private void ApplyCombatStats(ApplyCombatStatsMessage msg)
+        {
+            if (msg.Bonus)
+            {
+                _bonusStats += msg.Stats;
+            }
+            else
+            {
+                _baseStats += msg.Stats;
+            }
+
+            _parameter.Stats = _baseStats + _bonusStats;
+            if (msg.Stats.Health != 0)
+            {
+                _combatVitals.Health = Math.Max(1, Math.Min(_parameter.Stats.Health, _combatVitals.Health + msg.Stats.Health));
+            }
+
+            if (msg.Stats.Mana != 0)
+            {
+                _combatVitals.Mana = Math.Max(1, Math.Min(_parameter.Stats.Mana, _combatVitals.Mana + msg.Stats.Mana));
+            }
+            _parameter.Vitals = _combatVitals;
+            _parent.RefreshParameters();
+
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
+            {
+                zone.EventManager.RegisterEvent(new UpdateCombatStatsEvent
+                {
+                    Stats = _parameter.Stats,
+                    Secondary = _bonusSecondary,
+                    Vitals = _combatVitals,
+                    OwnerId = _parent.Data.Id
+                });
             }
         }
     }

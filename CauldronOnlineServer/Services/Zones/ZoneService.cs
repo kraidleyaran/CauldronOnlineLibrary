@@ -16,6 +16,7 @@ namespace CauldronOnlineServer.Services.Zones
 
         public const string NAME = "Zone";
         public const string ZONE = "Zone";
+        public const string GLOBAL_ZONE_FILTER = "GlobalZone";
 
         private static ZoneService _instance = null;
 

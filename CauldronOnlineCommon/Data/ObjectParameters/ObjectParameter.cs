@@ -327,4 +327,26 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public override string Type => TYPE;
     }
 
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class ProjectileRedirectParameter : ObjectParameter
+    {
+        public const string TYPE = "ProjectileRedirect";
+        public WorldVector2Int Direction { get; set; }
+        public HitboxData Hitbox { get; set; }
+        public string[] Tags { get; set; }
+        public override string Type => TYPE;
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class BombableDoorParameter : ObjectParameter
+    {
+        public const string TYPE = "BombableDoor";
+        public HitboxData Hitbox { get; set; }
+        public bool Open { get; set; }
+        public int BombingExperience { get; set; }
+        public override string Type => TYPE;
+    }
+
 }

@@ -2,6 +2,6 @@
 {
     public enum AiState
     {
-        Idle,Wander,Aggro
+        Idle,Wander,Aggro,OutOfBounds
     }
 }

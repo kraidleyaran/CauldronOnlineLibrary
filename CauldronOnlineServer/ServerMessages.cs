@@ -271,4 +271,28 @@ namespace CauldronOnlineServer
     {
         public Action<string> DoAfter;
     }
+
+    public class PlayerEnteredWorldMessage : EventMessage
+    {
+        public static PlayerEnteredWorldMessage INSTANCE = new PlayerEnteredWorldMessage();
+    }
+
+    public class PlayerLeftWorldMessage : EventMessage
+    {
+        public static PlayerLeftWorldMessage INSTANCE = new PlayerLeftWorldMessage();
+    }
+
+    public class SetCombatStatsMessage : EventMessage
+    {
+        public CombatStats Stats;
+        public SecondaryStats Secondary;
+        public CombatVitals Vitals;
+    }
+
+    public class ApplyCombatStatsMessage : EventMessage
+    {
+        public CombatStats Stats;
+        public bool Bonus;
+    }
+    
 }

@@ -267,6 +267,12 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                             obj.AddTrait(new DelayedSpawnTrait(delayed));
                         }
                         break;
+                    case BombableDoorParameter.TYPE:
+                        if (parameter is BombableDoorParameter bombable)
+                        {
+                            obj.AddTrait(new BombableDoorTrait(bombable));
+                        }
+                        break;
                         
                 }
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CauldronOnlineCommon;
+using CauldronOnlineServer.Services.Player;
 
 namespace CauldronOnlineServer.Services.Client
 {
@@ -50,7 +51,8 @@ namespace CauldronOnlineServer.Services.Client
             var id = _instance.GenerateId();
             _instance._clients.Add(id, new PlayerClient(connectionId, id));
             _instance._reverseLookup.Add(connectionId, id);
-            WorldServer.SendToClient(new ClientConnectResultMessage { Success = true, ClientId = id }, connectionId);
+            var playerId = PlayerService.RegisterPlayer(id);
+            WorldServer.SendToClient(new ClientConnectResultMessage { Success = true, ClientId = id, PlayerId = playerId}, connectionId);
         }
 
         public static void UnregisterClient(int connectionId)

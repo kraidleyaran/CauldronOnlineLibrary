@@ -46,6 +46,8 @@ namespace CauldronOnlineServer.Services.Zones.Managers
             this.SubscribeWithFilter<UpdateCurrentZoneTickMessage>(UpdateCurrentZoneTick, _zoneId);
             this.SubscribeWithFilter<ZoneEventProcessTickMessage>(ZoneEventProcessTick, _zoneId);
             this.SubscribeWithFilter<ZonePlayerUpdateTickMessage>(ZonePlayerUpdateTick, _zoneId);
+            this.SubscribeWithFilter<PlayerEnteredWorldMessage>(PlayerEnteredWorld, ZoneService.GLOBAL_ZONE_FILTER);
+            this.SubscribeWithFilter<PlayerLeftWorldMessage>(PlayerLeftWorld, ZoneService.GLOBAL_ZONE_FILTER);
         }
 
         private void UpdateCurrentZoneTick(UpdateCurrentZoneTickMessage msg)
@@ -221,6 +223,21 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                                         }
                                     }
                                     break;
+                                case PlayerEnteredWorldEvent.ID:
+                                    this.SendMessageWithFilter(PlayerEnteredWorldMessage.INSTANCE, _zoneId);
+                                    break;
+                                case PlayerLeftWorldEvent.ID:
+                                    this.SendMessageWithFilter(PlayerLeftWorldMessage.INSTANCE, _zoneId);
+                                    break;
+                                case UpdateCombatStatsEvent.ID:
+                                    if (worldEvent is UpdateCombatStatsEvent updateCombatStats)
+                                    {
+                                        if (zone.ObjectManager.TryGetObjectById(updateCombatStats.OwnerId, out var obj))
+                                        {
+                                            obj.SendMessageTo(new SetCombatStatsMessage{Stats = updateCombatStats.Stats, Secondary = updateCombatStats.Secondary, Vitals = updateCombatStats.Vitals}, obj);
+                                        }
+                                    }
+                                    break;
                             }
                             _processedEvents.Enqueue(worldEvent);
                         }
@@ -244,5 +261,15 @@ namespace CauldronOnlineServer.Services.Zones.Managers
 
         }
 
+        private void PlayerEnteredWorld(PlayerEnteredWorldMessage msg)
+        {
+            _worldEvents.Enqueue(new PlayerEnteredWorldEvent{Tick = _currentTick, Order = _processedEvents.Count + _worldEvents.Count});
+        }
+
+
+        private void PlayerLeftWorld(PlayerLeftWorldMessage msg)
+        {
+            _worldEvents.Enqueue(new PlayerLeftWorldEvent { Tick = _currentTick, Order = _processedEvents.Count + _worldEvents.Count });
+        }
     }
 }
