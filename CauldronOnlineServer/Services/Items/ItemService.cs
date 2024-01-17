@@ -11,6 +11,7 @@ namespace CauldronOnlineServer.Services.Items
     public class ItemService : WorldService
     {
         public const string NAME = "Item";
+        public const string DROPPED_ITEM = "DroppedItem";
 
         private static ItemService _instance = null;
 
@@ -99,6 +100,11 @@ namespace CauldronOnlineServer.Services.Items
             }
 
             return false;
+        }
+
+        public static string GenerateDroppedItemId(string ownerId)
+        {
+            return $"{ownerId}-{DROPPED_ITEM}-{Guid.NewGuid().ToString()}";
         }
     }
 }

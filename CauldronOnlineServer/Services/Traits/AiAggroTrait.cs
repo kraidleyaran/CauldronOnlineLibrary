@@ -28,6 +28,7 @@ namespace CauldronOnlineServer.Services.Traits
         private float _diagonalCost = 0f;
         private AggroType _aggroType = AggroType.Aggressive;
         private bool _healOnAggroLoss = false;
+        private bool _alwaysAggrod = false;
 
         private ConcurrentQueue<AggroRequest> _aggroRequests = new ConcurrentQueue<AggroRequest>();
 
@@ -47,19 +48,26 @@ namespace CauldronOnlineServer.Services.Traits
                 _diagonalCost = aggroData.DiagonalCost;
                 _aggroType = aggroData.AggroType;
                 _healOnAggroLoss = aggroData.HealOnAggroLoss;
+                _alwaysAggrod = aggroData.AlwaysAggrod;
             }
-        }
-
-        private bool IsTargetAggrod(WorldObject target)
-        {
-            return _pov.Contains(target.Tile);
         }
 
         public override void Setup(WorldObject parent, object sender)
         {
             base.Setup(parent, sender);
-            _parent.AddParameter(new AggroParameter{AggroRange = _aggroRange});
+            _parent.AddParameter(new AggroParameter{AggroRange = _aggroRange, AlwaysAggrod = _alwaysAggrod});
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
+            {
+                _pov = zone.GetTilesInPovArea(_parent.Tile, _aggroRange).ToList();
+                this.SendMessageTo(new UpdatePovMessage { Pov = _pov.ToArray() }, _parent);
+            }
             SubscribeToMessages();
+        }
+
+        private bool IsTargetAggrod(WorldObject target)
+        {
+            return _pov.Contains(target.Tile);
         }
 
         private void AggressivePathingCheck(WorldZone zone)
@@ -111,7 +119,10 @@ namespace CauldronOnlineServer.Services.Traits
                             var currentDirection = _parent.Tile.Position.Direction(_currentPath[_currentPath.Count - 1].Position);
                             if (targetDirection != currentDirection)
                             {
-                                _aggrod[_currentTarget] += CombatService.Settings.AggroPerPathChangeCheck(2);
+                                if (!_alwaysAggrod)
+                                {
+                                    _aggrod[_currentTarget] += CombatService.Settings.AggroPerPathChangeCheck(2);
+                                }
                                 _currentPath.Clear();
                                 this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
                             }
@@ -181,7 +192,10 @@ namespace CauldronOnlineServer.Services.Traits
                     var targetDistance = _parent.Tile.Position.Distance(_lastTargetTile.Position);
                     if (targetDistance > _aggroRange || targetDistance < _aggroRange / 2)
                     {
-                        _aggrod[_currentTarget] += CombatService.Settings.AggroPerPathChangeCheck(2);
+                        if (!_alwaysAggrod)
+                        {
+                            _aggrod[_currentTarget] += CombatService.Settings.AggroPerPathChangeCheck(2);
+                        }
                         _currentPath.Clear();
                         this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
                     }
@@ -248,7 +262,10 @@ namespace CauldronOnlineServer.Services.Traits
                     var targetDistance = _parent.Tile.Position.Distance(_lastTargetTile.Position);
                     if (targetDistance > _aggroRange)
                     {
-                        _aggrod[_currentTarget] += CombatService.Settings.AggroPerPathChangeCheck(2);
+                        if (!_alwaysAggrod)
+                        {
+                            _aggrod[_currentTarget] += CombatService.Settings.AggroPerPathChangeCheck(2);
+                        }
                         _currentPath.Clear();
                         this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
                     }
@@ -278,37 +295,42 @@ namespace CauldronOnlineServer.Services.Traits
             _parent.SubscribeWithFilter<KnockbackFinishedMessage>(KnockbackFinished, _id);
             _parent.SubscribeWithFilter<TakeDamageMessage>(TakeDamage, _id);
             _parent.SubscribeWithFilter<RemoveFromAggroMessage>(RemoveFromAggro, _id);
+            _parent.SubscribeWithFilter<QueryTargetMessage>(QueryTarget, _id);
         }
 
         private void ZoneUpdateTick(ZoneUpdateTickMessage msg)
         {
             if (_parent.State == WorldObjectState.Active && !_knockbackActive)
             {
-                var removedFromAggroMsg = new RemoveFromAggroMessage{OwnerId = _parent.Data.Id};
-                var aggrod = _aggrod.ToArray();
-                foreach (var obj in aggrod)
+                if (!_alwaysAggrod)
                 {
-                    if (obj.Value <= 0)
+                    var removedFromAggroMsg = new RemoveFromAggroMessage { OwnerId = _parent.Data.Id };
+                    var aggrod = _aggrod.ToArray();
+                    foreach (var obj in aggrod)
                     {
-                        if (!_aware.Contains(obj.Key))
+                        if (obj.Value <= 0)
                         {
-                            _aggrod.Remove(obj.Key);
-                            if (_currentTarget == obj.Key)
+                            if (!_aware.Contains(obj.Key))
                             {
-                                if (_currentPath.Count > 0)
+                                _aggrod.Remove(obj.Key);
+                                if (_currentTarget == obj.Key)
                                 {
-                                    _currentPath.Clear();
-                                    this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
+                                    if (_currentPath.Count > 0)
+                                    {
+                                        _currentPath.Clear();
+                                        this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
+                                    }
+                                    _currentTarget = string.Empty;
+                                    _lastTargetTile = null;
                                 }
-                                _currentTarget = string.Empty;
-                                _lastTargetTile = null;
+                                this.SendMessageWithFilter(removedFromAggroMsg, obj.Key);
                             }
-                            this.SendMessageWithFilter(removedFromAggroMsg, obj.Key);
+
+
                         }
-                        
-                        
                     }
                 }
+                
 
                 var zone = ZoneService.GetZoneById(_parent.ZoneId);
                 if (zone != null)
@@ -504,7 +526,7 @@ namespace CauldronOnlineServer.Services.Traits
             var zone = ZoneService.GetZoneById(_parent.ZoneId);
             if (zone != null)
             {
-                _pov = zone.GetTilesInPovArea(_parent.Tile, _aggroRange).ToList();
+                _pov = zone.GetTilesInPovArea(_parent.Tile, _aggroRange).Where(t => !t.Blocked).ToList();
                 this.SendMessageTo(new UpdatePovMessage{Pov = _pov.ToArray()}, _parent);
             }
         }
@@ -518,9 +540,12 @@ namespace CauldronOnlineServer.Services.Traits
         {
             if (_parent.State != WorldObjectState.Active && _parent.State != WorldObjectState.Attacking)
             {
-                _aggrod.Clear();
-                _currentTarget = string.Empty;
-                _currentPath.Clear();
+                if (!_alwaysAggrod && _parent.State != WorldObjectState.Teleporting)
+                {
+                    _aggrod.Clear();
+                    _currentTarget = string.Empty;
+                    _currentPath.Clear();
+                }
                 _lastTargetTile = null;
             }
         }
@@ -566,6 +591,11 @@ namespace CauldronOnlineServer.Services.Traits
                 this.SendMessageTo(ClearCurrentPathMessage.INSTANCE, _parent);
                 _currentTarget = string.Empty;
             }
+        }
+
+        private void QueryTarget(QueryTargetMessage msg)
+        {
+            msg.DoAfter.Invoke(_currentTarget);
         }
 
         public override void Destroy()

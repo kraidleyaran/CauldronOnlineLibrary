@@ -4,8 +4,10 @@ using CauldronOnlineCommon.Data.ObjectParameters;
 using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Services.Items;
+using CauldronOnlineServer.Services.TriggerEvents;
 using CauldronOnlineServer.Services.Zones;
 using CauldronOnlineServer.Services.Zones.Managers;
+using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Traits
 {
@@ -35,6 +37,8 @@ namespace CauldronOnlineServer.Services.Traits
                 _parameter.RefillTicks = lootData.RefillTicks;
                 _parameter.DestroyAfterOpen = lootData.DestroyAfterOpen;
                 _parameter.DestroyTicks = lootData.DestroyTicks;
+                _parameter.ResetOnEvents = lootData.ResetOnEvents;
+                _parameter.DestroyOnReset = lootData.DestroyOnReset;
             }
         }
 
@@ -52,7 +56,7 @@ namespace CauldronOnlineServer.Services.Traits
                 var zone = ZoneService.GetZoneById(_parent.ZoneId);
                 if (zone != null)
                 {
-                    zone.EventManager.RegisterEvent(new ChestOpenEvent { TargetId = _parent.Data.Id });
+                    zone.EventManager.RegisterEvent(new ChestOpenEvent { TargetId = _parent.Data.Id, PlayerName = player});
                     var lootTable = ItemService.GetLootTable(_parameter.LootTable);
                     if (lootTable != null)
                     {
@@ -79,8 +83,12 @@ namespace CauldronOnlineServer.Services.Traits
 
         private void RefillChest()
         {
-            _refillTimer.Destroy();
-            _refillTimer = null;
+            if (_refillTimer != null)
+            {
+                _refillTimer.Destroy();
+                _refillTimer = null;
+            }
+
             if (_open)
             {
                 _open = false;
@@ -95,8 +103,12 @@ namespace CauldronOnlineServer.Services.Traits
 
         private void DestroyChest()
         {
-            _destroyTimer.Destroy();
-            _destroyTimer = null;
+            if (_destroyTimer != null)
+            {
+                _destroyTimer.Destroy();
+                _destroyTimer = null;
+            }
+
             if (!_open)
             {
                 var zone = ZoneService.GetZoneById(_parent.ZoneId);
@@ -107,16 +119,42 @@ namespace CauldronOnlineServer.Services.Traits
             }
         }
 
+        protected internal override void SubscribeToMessages()
+        {
+            base.SubscribeToMessages();
+            if (_parameter.ResetOnEvents.Length > 0)
+            {
+                foreach (var trigger in _parameter.ResetOnEvents)
+                {
+                    this.SubscribeWithFilter<ZoneEventTriggerMessage>(ZoneEventTrigger, TriggerEventService.GetFilter(_parent.ZoneId, trigger));
+                }
+            }
+        }
+
+        private void ZoneEventTrigger(ZoneEventTriggerMessage msg)
+        {
+            if (_parameter.DestroyOnReset)
+            {
+                DestroyChest();
+            }
+            else
+            {
+                RefillChest();
+            }
+        }
+
         public override void Destroy()
         {
             if (_refillTimer != null)
             {
                 _refillTimer.Destroy();
+                _refillTimer = null;
             }
 
             if (_destroyTimer != null)
             {
                 _destroyTimer.Destroy();
+                _destroyTimer = null;
             }
             base.Destroy();
         }

@@ -2,6 +2,6 @@
 {
     public enum WorldObjectState
     {
-        Active,Attacking,Destroying,Destroyed,Disabled,Reviving,Transferring,Charging
+        Active,Attacking,Destroying,Destroyed,Disabled,Reviving,Transferring,Charging,Teleporting
     }
 }

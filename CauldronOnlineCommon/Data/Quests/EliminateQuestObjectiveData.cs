@@ -10,5 +10,6 @@ namespace CauldronOnlineCommon.Data.Quests
         public override string Type => TYPE;
 
         public ZoneSpawnData Template;
+        public bool StaticPosition;
     }
 }

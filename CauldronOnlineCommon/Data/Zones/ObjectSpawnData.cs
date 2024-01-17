@@ -14,5 +14,6 @@ namespace CauldronOnlineCommon.Data.Zones
         public bool ShowNameOnClient;
         public bool ShowAppearance;
         public bool StartActive;
+        public string MinimapIcon;
     }
 }

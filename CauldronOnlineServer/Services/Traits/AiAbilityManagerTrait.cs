@@ -20,6 +20,7 @@ namespace CauldronOnlineServer.Services.Traits
         private ZoneTile[] _pov = new ZoneTile[0];
 
         private TickTimer _castingTimer = null;
+        private TickTimer _afterTimer = null;
 
         public AiAbilityManagerTrait(WorldTraitData data) : base(data)
         {
@@ -51,7 +52,16 @@ namespace CauldronOnlineServer.Services.Traits
             }
             if (_parent.State == WorldObjectState.Attacking)
             {
-                _parent.SetObjectState(WorldObjectState.Active);
+                if (ability.AfterTicks > 0)
+                {
+                    _afterTimer = new TickTimer(ability.AfterTicks, 0, _parent.ZoneId);
+                    _afterTimer.OnComplete += OnAfterTimerFinished;
+                }
+                else
+                {
+                    _parent.SetObjectState(WorldObjectState.Active);
+                }
+                
             }
 
             var timer = new TickTimer(ability.Cooldown, 0, _parent.ZoneId);
@@ -67,6 +77,17 @@ namespace CauldronOnlineServer.Services.Traits
                 _cooldowns.Remove(ability);
                 timer.Destroy();
             }
+        }
+
+        private void OnAfterTimerFinished()
+        {
+            _afterTimer.Destroy();
+            _afterTimer = null;
+            if (_parent.State == WorldObjectState.Attacking)
+            {
+                _parent.SetObjectState(WorldObjectState.Active);
+            }
+            
         }
 
         private bool AbilityCanbeUsed(AiAbilityData ability, int distance, ZoneTile tile)
@@ -113,7 +134,7 @@ namespace CauldronOnlineServer.Services.Traits
             var zone = ZoneService.GetZoneById(_parent.ZoneId);
             if (zone != null)
             {
-                var availableAbilities = _abilities.Where(a => AbilityCanbeUsed(a, msg.Distance, msg.Target.Tile)).OrderBy(a => a.Priority).ToArray();
+                var availableAbilities = _abilities.Where(a => AbilityCanbeUsed(a, msg.Distance, msg.Target.Tile)).OrderByDescending(a => a.Priority).ToArray();
                 if (availableAbilities.Length > 0)
                 {
                     AiAbilityData ability = null;
@@ -136,6 +157,10 @@ namespace CauldronOnlineServer.Services.Traits
                     this.SendMessageTo(new SetFaceDirectionMessage{Direction = msg.Direction}, _parent);
                     zone.EventManager.RegisterEvent(new AbilityEvent { OwnerId = _parent.Data.Id, TargetId = msg.Target.Data.Id, Direction = msg.Direction, Ability = ability.Ability, Position = _parent.Data.Position, Ids = ids });
 
+                    if (ability.Mana > 0)
+                    {
+                        this.SendMessageTo(new RemoveManaMessage{Amount = ability.Mana}, _parent);
+                    }
                     _castingTimer = new TickTimer(ability.Length, 0, _parent.ZoneId);
                     _castingTimer.OnComplete += () => { OnAbilityTimerFinished(ability); };
                     _parent.SetObjectState(WorldObjectState.Attacking);

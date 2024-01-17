@@ -4,10 +4,13 @@ using Telepathy;
 namespace CauldronOnlineCommon
 {
     public delegate void OnClientState(WorldClientState state);
+    public delegate void OnMessageData(int dataLength);
 
     public class WorldClient
     {
         public event OnClientState OnStateUpdate;
+        public event OnMessageData OnMessageData;
+
         public WorldClientState State
         {
             get => _state;
@@ -52,6 +55,7 @@ namespace CauldronOnlineCommon
                             State = WorldClientState.Connected;
                             break;
                         case EventType.Data:
+                            OnMessageData?.Invoke(message.data.Length);
                             clientMessages.Add(message.data.GenerateMessageFromData());
                             break;
                         case EventType.Disconnected:

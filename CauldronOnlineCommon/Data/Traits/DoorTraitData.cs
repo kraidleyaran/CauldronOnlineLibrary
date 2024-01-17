@@ -2,6 +2,7 @@
 using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.Items;
 using CauldronOnlineCommon.Data.Math;
+using CauldronOnlineCommon.Data.Switches;
 
 namespace CauldronOnlineCommon.Data.Traits
 {
@@ -15,9 +16,11 @@ namespace CauldronOnlineCommon.Data.Traits
         public WorldItemStackData[] RequiredItems;
         public HitboxData Hitbox;
         public string[] TriggerEvents;
+        public RequiredSwitchSignalData[] Signals;
         public bool RequireAllTriggerEvents;
         public float Rotation;
         public bool AllowOpenWithNoItems;
+        public bool ApplyTrapSpawn;
         public WorldVector2Int TrappedSpawnPosition;
     }
 }

@@ -42,10 +42,10 @@ namespace CauldronOnlineServer.Services.Zones.Managers
             _tickThread = null;
         }
         
-
         public override void Destroy()
         {
             _active = false;
+            _tickThread.Join();
             base.Destroy();
         }
     }

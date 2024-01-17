@@ -94,5 +94,10 @@ namespace CauldronOnlineServer.Services.TriggerEvents
             }
             return _instance._events.ContainsKey(eventName);
         }
+
+        public static void ResetEvent(string eventName)
+        {
+            _instance._triggered.TryRemove(eventName, out var triggerEvent);
+        }
     }
 }

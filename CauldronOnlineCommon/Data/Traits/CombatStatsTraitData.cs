@@ -10,5 +10,7 @@ namespace CauldronOnlineCommon.Data.Traits
         public override string Type => TYPE;
 
         public CombatStats Stats;
+        public bool StartWithEmptyMana;
+        public bool IsBoss;
     }
 }

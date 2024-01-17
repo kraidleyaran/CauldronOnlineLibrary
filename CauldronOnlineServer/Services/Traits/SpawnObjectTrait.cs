@@ -32,7 +32,7 @@ namespace CauldronOnlineServer.Services.Traits
                     zone.ObjectManager.RequestObject(_zoneSpawn.Spawn.DisplayName, _zoneSpawn.Spawn.Traits,
                         _zoneSpawn.Spawn.ShowNameOnClient, _zoneSpawn.Spawn.Parameters, tile.WorldPosition,
                         _zoneSpawn.Spawn.IsMonster, null, _zoneSpawn.Spawn.ShowOnClient, true,
-                        _zoneSpawn.Spawn.ShowAppearance, _zoneSpawn.StartActive);
+                        _zoneSpawn.Spawn.ShowAppearance, _zoneSpawn.StartActive, _zoneSpawn.Spawn.MinimapIcon);
                 }
             }
         }

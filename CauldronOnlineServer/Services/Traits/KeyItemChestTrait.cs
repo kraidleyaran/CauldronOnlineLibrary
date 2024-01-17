@@ -48,7 +48,7 @@ namespace CauldronOnlineServer.Services.Traits
                 var zone = ZoneService.GetZoneById(_parent.ZoneId);
                 if (zone != null)
                 {
-                    zone.EventManager.RegisterEvent(new ChestOpenEvent{TargetId = _parent.Data.Id});
+                    zone.EventManager.RegisterEvent(new ChestOpenEvent{TargetId = _parent.Data.Id, PlayerName = playerName});
                     zone.EventManager.RegisterEvent(new KeyItemLootEvent{Position = _parent.Data.Position, Item = _parameter.Item.Item, Stack = _parameter.Item.Stack, TargetId = _parent.Data.Id, PlayerName = playerName});                    
                 }
 

@@ -14,5 +14,6 @@ namespace CauldronOnlineCommon.Data.Combat
         public int Ids;
         public AbilitySight Sight;
         public string[] ApplyAfterCast;
+        public int AfterTicks;
     }
 }

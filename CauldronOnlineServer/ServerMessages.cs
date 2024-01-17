@@ -294,5 +294,39 @@ namespace CauldronOnlineServer
         public CombatStats Stats;
         public bool Bonus;
     }
-    
+
+    public class QueryTargetMessage : EventMessage
+    {
+        public Action<string> DoAfter;
+    }
+
+    public class PlayerQuestInteractionMessage : EventMessage
+    {
+        public int ConnectionId;
+    }
+
+    public class RestoreManaMessage : EventMessage
+    {
+        public int Amount;
+    }
+
+    public class RemoveManaMessage : EventMessage
+    {
+        public int Amount;
+    }
+
+    public class DamageTakenMessage : EventMessage
+    {
+        public int Amount;
+    }
+
+    public class ClaimItemMessage : EventMessage
+    {
+        public WorldObject Owner;
+    }
+
+    public class ZoneResetRequestMessage : EventMessage
+    {
+        public int ConnectionId;
+    }
 }

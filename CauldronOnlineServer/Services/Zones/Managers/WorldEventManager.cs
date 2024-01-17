@@ -5,7 +5,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using CauldronOnlineCommon;
 using CauldronOnlineCommon.Data;
+using CauldronOnlineCommon.Data.ObjectParameters;
 using CauldronOnlineCommon.Data.WorldEvents;
+using CauldronOnlineServer.Services.Traits;
 using ConcurrentMessageBus;
 
 namespace CauldronOnlineServer.Services.Zones.Managers
@@ -39,6 +41,12 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                 _processedEvents.Enqueue(worldEvent);
             }
             
+        }
+
+        private void DroppedItemCreated(WorldObject obj, PlayerDroppedItemEvent itemEvent)
+        {
+            obj.AddTrait(new PlayerDroppedItemTrait(itemEvent.Item, itemEvent.Stack));
+            itemEvent.ObjectId = obj.Data.Id;
         }
 
         private void SubscribeToMessages()
@@ -78,9 +86,10 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                                 case MovementEvent.ID:
                                     if (worldEvent is MovementEvent movement)
                                     {
-                                        if (zone.IsValidPosition(movement.Position) && zone.ObjectManager.TryGetObjectById(movement.Id, out var obj))
+                                        if (zone.ObjectManager.TryGetObjectById(movement.Id, out var obj))
                                         {
                                             obj.SetPosition(movement.Position);
+                                            obj.Data.Direction = movement.Direction;
                                         }
                                     }
                                     break;
@@ -145,7 +154,7 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                                     {
                                         if (zone.ObjectManager.TryGetObjectById(door.TargetId, out var obj))
                                         {
-                                            obj.SendMessageTo(new SetDoorStateMessage{Open = true}, obj);
+                                            obj.SendMessageTo(new SetDoorStateMessage{Open = true, IsEvent = true}, obj);
                                         }
                                     }
                                     break;
@@ -238,6 +247,28 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                                         }
                                     }
                                     break;
+                                case PlayerDroppedItemEvent.ID:
+                                    if (worldEvent is PlayerDroppedItemEvent droppedItem)
+                                    {
+                                        zone.ObjectManager.RequestObject(droppedItem.Item, new string[0], false, new ObjectParameter[0], droppedItem.Position, false, obj => DroppedItemCreated(obj, droppedItem), true, true);
+                                    }
+                                    break;
+                                case PlayerClaimItemEvent.ID:
+                                    if (worldEvent is PlayerClaimItemEvent playerClaimItem)
+                                    {
+                                        if (zone.ObjectManager.TryGetObjectById(playerClaimItem.OwnerId, out var playerObj))
+                                        {
+                                            if (zone.ObjectManager.TryGetObjectById(playerClaimItem.ObjectId, out var itemObj))
+                                            {
+                                                playerObj.SendMessageTo(new ClaimItemMessage { Owner = playerObj }, itemObj);
+                                            }
+                                            else
+                                            {
+                                                playerObj.SendMessageTo(new ClientClaimItemResultMessage{Success = false, ObjectId = playerClaimItem.ObjectId}, playerObj);
+                                            }
+                                        }
+                                    }
+                                    break;
                             }
                             _processedEvents.Enqueue(worldEvent);
                         }
@@ -270,6 +301,16 @@ namespace CauldronOnlineServer.Services.Zones.Managers
         private void PlayerLeftWorld(PlayerLeftWorldMessage msg)
         {
             _worldEvents.Enqueue(new PlayerLeftWorldEvent { Tick = _currentTick, Order = _processedEvents.Count + _worldEvents.Count });
+        }
+
+        public override void Destroy()
+        {
+            _worldEvents = new ConcurrentQueue<WorldEvent>();
+            _processedEvents = new ConcurrentQueue<WorldEvent>();
+            _currentTick = new WorldTick();
+            _playerWorldEventsUpdateMsg = null;
+            _zoneId = string.Empty;
+            base.Destroy();
         }
     }
 }

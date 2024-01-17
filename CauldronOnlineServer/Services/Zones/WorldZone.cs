@@ -5,6 +5,7 @@ using CauldronOnlineCommon;
 using CauldronOnlineCommon.Data.Math;
 using CauldronOnlineCommon.Data.Zones;
 using CauldronOnlineServer.Interfaces;
+using CauldronOnlineServer.Services.TriggerEvents;
 using CauldronOnlineServer.Services.Zones.Managers;
 using ConcurrentMessageBus;
 using RogueSharp;
@@ -13,7 +14,7 @@ namespace CauldronOnlineServer.Services.Zones
 {
     public class WorldZone : IDestroyable
     {
-        public string Name;
+        public WorldZoneData Data;
         public string Id;
 
         public TickManager Tick;
@@ -21,6 +22,7 @@ namespace CauldronOnlineServer.Services.Zones
         public WorldEventManager EventManager;
         public WorldVector2Int DefaultSpawn;
         public TriggerEventManager TriggerManager;
+        //public MinimapManager Minimap;
 
         private Dictionary<WorldVector2Int, ZoneTile> _tiles = new Dictionary<WorldVector2Int, ZoneTile>();
         private WorldVector2Int _size = WorldVector2Int.Zero;
@@ -28,19 +30,24 @@ namespace CauldronOnlineServer.Services.Zones
 
         private Map _pathingMap = null;
 
-        public WorldZone(WorldZoneData data, string zoneId)
+        public WorldZone(WorldZoneData data)
+        {
+            Data = data;
+        }
+
+        public void Startup(string zoneId)
         {
             Id = zoneId;
-            Name = data.Name;
-            DefaultSpawn = data.DefaultSpawn;
+            DefaultSpawn = Data.DefaultSpawn;
             SubscribeToMessages();
-            ObjectManager = new ObjectManager(Id, data.DefaultSpawn);
+            ObjectManager = new ObjectManager(Id, Data.DefaultSpawn);
             EventManager = new WorldEventManager(Id);
             TriggerManager = new TriggerEventManager(Id);
-            _pathingMap = new Map(data.Size.X, data.Size.Y);
-            _offset = data.Offset;
-            _size = data.Size;
-            foreach (var tile in data.Tiles)
+            //Minimap = new MinimapManager(Id);
+            _pathingMap = new Map(Data.Size.X, Data.Size.Y);
+            _offset = Data.Offset;
+            _size = Data.Size;
+            foreach (var tile in Data.Tiles)
             {
                 if (!_tiles.ContainsKey(tile.Position))
                 {
@@ -51,12 +58,12 @@ namespace CauldronOnlineServer.Services.Zones
                 }
             }
 
-            foreach (var spawnData in data.Spawns)
+            foreach (var spawnData in Data.Spawns)
             {
                 var tile = GetTile(spawnData.Tile);
                 if (tile != null)
                 {
-                    ObjectManager.RequestObject(spawnData.Spawn.DisplayName, spawnData.Spawn.Traits, spawnData.Spawn.ShowOnClient, spawnData.Spawn.Parameters, tile.WorldPosition, spawnData.Spawn.IsMonster, null, spawnData.Spawn.ShowOnClient, false, false, spawnData.Spawn.StartActive);
+                    ObjectManager.RequestObject(spawnData.Spawn.DisplayName, spawnData.Spawn.Traits, spawnData.Spawn.ShowOnClient, spawnData.Spawn.Parameters, tile.WorldPosition, spawnData.Spawn.IsMonster, null, spawnData.Spawn.ShowOnClient, false, false, spawnData.Spawn.StartActive, spawnData.Spawn.MinimapIcon);
                 }
             }
 
@@ -71,13 +78,24 @@ namespace CauldronOnlineServer.Services.Zones
 
         public ZoneTile FindClosestTile(ZoneTile previousTile, WorldVector2Int currentPos)
         {
-            var distance = currentPos.Distance(previousTile.WorldPosition);
-            var tile = GetTilesInPovArea(previousTile, distance).OrderBy(t => currentPos.Distance(t.WorldPosition)).FirstOrDefault();
+            var distance = currentPos.Distance(previousTile.Position);
+            var tile = GetTilesInPovArea(previousTile, distance).OrderBy(t => currentPos.SqrDistance(t.Position)).FirstOrDefault();
             if (tile != null)
             {
                 return tile;
             }
             return previousTile;
+        }
+
+        public ZoneTile FindClosesTileByWorldPosition(WorldVector2Int currentPos, ZoneTile lastTile, int distance)
+        {
+            var tile = GetTilesInPovArea(lastTile, distance).OrderBy(t => currentPos.SqrDistance(t.Position)).FirstOrDefault();
+            if (tile != null)
+            {
+                return tile;
+            }
+
+            return lastTile;
         }
 
         public ZoneTile GetTileByWorldPosition(WorldVector2Int worldPos)
@@ -221,6 +239,21 @@ namespace CauldronOnlineServer.Services.Zones
             return cells.Select(c => GetTileByCellPosition(new WorldVector2Int(c.X, c.Y))).ToArray();
         }
 
+        public ZoneTile[] GetTiles(WorldVector2Int[] tiles)
+        {
+            var returnTiles = new List<ZoneTile>();
+            foreach (var tilePos in tiles)
+            {
+                var tile = GetTile(tilePos);
+                if (tile != null)
+                {
+                    returnTiles.Add(tile);
+                }
+            }
+
+            return returnTiles.ToArray();
+        }
+
         private void SubscribeToMessages()
         {
             this.SubscribeWithFilter<ZoneUpdateTickMessage>(ZoneUpdateTick, Id);
@@ -232,6 +265,16 @@ namespace CauldronOnlineServer.Services.Zones
             this.Unsubscribe<ZoneUpdateTickMessage>();
         }
 
+        public void Reset()
+        {
+            foreach (var triggerEvent in Data.ResetEvents)
+            {
+                TriggerEventService.ResetEvent(triggerEvent);
+            }
+            Destroy();
+
+        }
+
         public void Destroy()
         {
             foreach (var tile in _tiles)
@@ -239,6 +282,13 @@ namespace CauldronOnlineServer.Services.Zones
                 tile.Value.Destroy();
             }
             _tiles.Clear();
+
+            TriggerManager.Destroy();
+            ObjectManager.Destroy();
+            Tick.Destroy();
+            EventManager.Destroy();
+            this.UnsubscribeFromAllMessages();
+            Id = string.Empty;
             _pathingMap.Clear();
             _pathingMap = null;
             _offset = WorldVector2Int.Zero;

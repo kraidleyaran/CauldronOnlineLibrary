@@ -15,6 +15,7 @@ namespace CauldronOnlineServer.Services.Traits
                 _parameter.Direction = projectileData.Direction;
                 _parameter.Hitbox = projectileData.Hitbox;
                 _parameter.Tags = projectileData.Tags;
+                _parameter.ProjectileDirectionIcon = projectileData.ProjectileDirectionIcon;
             }
         }
 

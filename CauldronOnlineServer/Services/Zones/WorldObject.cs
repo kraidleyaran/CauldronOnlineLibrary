@@ -21,14 +21,15 @@ namespace CauldronOnlineServer.Services.Zones
         private List<WorldTrait> _traits = new List<WorldTrait>();
         private Dictionary<string, ObjectParameter> _parameters = new Dictionary<string, ObjectParameter>();
 
-        public WorldObject(string id, string displayName, WorldVector2Int pos, ZoneTile tile, string zoneId)
+        public WorldObject(string id, string displayName, WorldVector2Int pos, ZoneTile tile, string zoneId, string minimapIcon = "")
         {
             Data = new ClientObjectData
             {
                 DisplayName = displayName,
                 Id = id,
                 Position = pos,
-                Parameters = new byte[0][]
+                Parameters = new byte[0][],
+                MinimapIcon = minimapIcon
             };
             Tile = tile;
             ZoneId = zoneId;
@@ -62,16 +63,17 @@ namespace CauldronOnlineServer.Services.Zones
             this.SendMessageTo(new UpdatePositionMessage{Position = Data.Position}, this);
         }
 
-        public void AddParameter<T>(T parameter) where T: ObjectParameter
+        public void AddParameter<T>(T parameter, string addKey = "") where T: ObjectParameter
         {
-            if (_parameters.TryGetValue(parameter.Type, out var existing))
+            var key = $"{parameter.Type}{addKey}";
+            if (_parameters.TryGetValue(key, out var existing))
             {
                 _parameters[parameter.Type] = parameter;
             }
             else
             {
                 existing = parameter;
-                _parameters.Add(parameter.Type, existing);
+                _parameters.Add(key, existing);
             }
 
             RefreshParameters();

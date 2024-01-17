@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using CauldronOnlineCommon.Data;
 using CauldronOnlineCommon.Data.Math;
 using CauldronOnlineCommon.Data.ObjectParameters;
+using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Requests;
 using CauldronOnlineServer.Services.SystemEvents;
@@ -17,6 +18,8 @@ namespace CauldronOnlineServer.Services.Zones.Managers
     public class ObjectManager : WorldManager
     {
         private const string OBJECT = "Obj";
+
+        public bool ContainsPlayers => _playerIdLookup.Count > 0;
 
         private Dictionary<string, WorldObject> _objects = new Dictionary<string, WorldObject>();
         private Dictionary<string, string> _playerIdLookup = new Dictionary<string, string>();
@@ -81,15 +84,15 @@ namespace CauldronOnlineServer.Services.Zones.Managers
             _destroyObjectRequests.Enqueue(new DestroyObjectRequest(id, playerId, action));
         }
 
-        public void RequestObject(string displayName, string[] traits, bool showName, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient, bool instant = false, bool showAppearance = false, bool startActive = true)
+        public void RequestObject(string displayName, string[] traits, bool showName, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient, bool instant = false, bool showAppearance = false, bool startActive = true, string minimapIcon = "")
         {
             if (instant)
             {
-                GenerateObject(displayName, traits, showName, parameters, position, isMonster, doAfter, showOnClient, showAppearance, startActive);
+                GenerateObject(displayName, traits, showName, parameters, position, isMonster, doAfter, showOnClient, showAppearance, startActive, minimapIcon);
             }
             else
             {
-                _createObjectRequests.Enqueue(new CreateObjectRequest(displayName, traits, showName, parameters, position, isMonster, doAfter, showOnClient, showAppearance, startActive));
+                _createObjectRequests.Enqueue(new CreateObjectRequest(displayName, traits, showName, parameters, position, isMonster, doAfter, showOnClient, showAppearance, startActive, minimapIcon));
             }
             
         }
@@ -150,12 +153,12 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                 _playerIdLookup.Add(request.WorldId, id);
                 _reversePlayerLookup.Add(id, request.WorldId);
                 zone.EventManager.RegisterEvent(new ObjectCreatedEvent{Data = obj.Data, ShowAppearance = true});
-                request.DoAfter?.Invoke(id, request.Data.DisplayName, zone.Name, pos);
+                request.DoAfter?.Invoke(id, request.Data.DisplayName, zone.Data.Name, pos);
             }
 
         }
 
-        private void GenerateObject(string displayName, string[] traits, bool showName, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient, bool showAppearance, bool startActive)
+        private void GenerateObject(string displayName, string[] traits, bool showName, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient, bool showAppearance, bool startActive, string minimapIcon = "")
         {
             var id = GenerateId();
             var zone = ZoneService.GetZoneById(_zoneId);
@@ -167,7 +170,7 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                     WorldServer.Log($"[ObjectManager] - Invalid tile position {position}");
                     tile = zone.GetTile(zone.DefaultSpawn);
                 }
-                var obj = new WorldObject(id, displayName, position, tile, _zoneId);
+                var obj = new WorldObject(id, displayName, position, tile, _zoneId, minimapIcon);
 
                 foreach (var traitName in traits)
                 {
@@ -273,7 +276,24 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                             obj.AddTrait(new BombableDoorTrait(bombable));
                         }
                         break;
-                        
+                    case StashParameter.TYPE:
+                        if (parameter is StashParameter stash)
+                        {
+                            obj.AddParameter(stash);
+                        }
+                        break;
+                    case GroupSpawnerTraitData.TYPE:
+                        if (parameter is GroupSpawnParameter group)
+                        {
+                            obj.AddTrait(new GroupSpawnerTrait(group));
+                        }
+                        break;
+                    case ZoneResetInteractionParameter.TYPE:
+                        if (parameter is ZoneResetInteractionParameter zoneReset)
+                        {
+                            obj.AddTrait(new ZoneResetInteractableTrait(zoneReset));
+                        }
+                        break;
                 }
             }
         }
@@ -315,7 +335,7 @@ namespace CauldronOnlineServer.Services.Zones.Managers
             {
                 while (_createObjectRequests.TryDequeue(out var request))
                 {
-                    GenerateObject(request.DisplayName, request.Traits, request.ShowName, request.Parameters, request.Position, request.IsMonster, request.DoAfter, request.ShowOnClient, request.ShowAppearance, request.StartActive);
+                    GenerateObject(request.DisplayName, request.Traits, request.ShowName, request.Parameters, request.Position, request.IsMonster, request.DoAfter, request.ShowOnClient, request.ShowAppearance, request.StartActive, request.MinimapIcon);
                 }
             }
         }
@@ -330,6 +350,27 @@ namespace CauldronOnlineServer.Services.Zones.Managers
                 }
             }
         }
-        
+
+        public override void Destroy()
+        {
+            foreach (var obj in _objects.Values)
+            {
+                obj.Destroy();
+            }
+            _objects.Clear();
+            while (_createPlayerRequests.TryDequeue(out var playerRequest))
+            {
+                playerRequest.DoAfter.Invoke(string.Empty, string.Empty, string.Empty, WorldVector2Int.Zero);
+            }
+
+            _createPlayerRequests = new ConcurrentQueue<CreatePlayerObjectRequest>();
+            _createObjectRequests = new ConcurrentQueue<CreateObjectRequest>();
+            _destroyObjectRequests = new ConcurrentQueue<DestroyObjectRequest>();
+            _playerIdLookup.Clear();
+            _reversePlayerLookup.Clear();
+            _zoneId = string.Empty;
+            _defaultSpawn = WorldVector2Int.Zero;
+            base.Destroy();
+        }
     }
 }

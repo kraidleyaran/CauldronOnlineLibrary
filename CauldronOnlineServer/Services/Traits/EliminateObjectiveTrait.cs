@@ -29,7 +29,8 @@ namespace CauldronOnlineServer.Services.Traits
 
         private void ObjectDeath(ObjectDeathMessage msg)
         {
-            this.SendMessageTo(new ApplyObjectiveItemCompletetionMessage{Objective = _objective}, _questParent);
+            this.SendMessageTo(new ApplyObjectiveItemCompletetionMessage{Objective = _objective, Count = 1}, _questParent);
+            _parent.RemoveTrait(this);
         }
     }
 }

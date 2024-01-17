@@ -31,6 +31,7 @@ namespace CauldronOnlineServer.Services.Traits
             _parameter.Stats = _baseStats + _bonusStats;
             _parameter.Vitals = _combatVitals;
             _parameter.BonusSecondary = _bonusSecondary;
+            _parameter.IsBoss = false;
             _destroyOnDeath = false;
         }
 
@@ -39,7 +40,10 @@ namespace CauldronOnlineServer.Services.Traits
             if (data is CombatStatsTraitData combatData)
             {
                 _baseStats = combatData.Stats;
+                _combatVitals.Health = _baseStats.Health;
+                _combatVitals.Mana = combatData.StartWithEmptyMana ? 0 : _baseStats.Mana;
                 _destroyOnDeath = true;
+                _parameter.IsBoss = combatData.IsBoss;
             }
         }
 
@@ -47,13 +51,15 @@ namespace CauldronOnlineServer.Services.Traits
         {
             base.Setup(parent, sender);
             var totalStats = _baseStats + _bonusStats;
-            _combatVitals.Health = totalStats.Health;
-            _combatVitals.Mana = totalStats.Mana;
+
             _parameter.Stats = totalStats;
             _parameter.Vitals = _combatVitals;
             _parameter.Monster = _destroyOnDeath;
             _parent.AddParameter(_parameter);
-            _parent.AddParameter(new ObjectDeathParameter());
+            if (!_parameter.IsBoss)
+            {
+                _parent.AddParameter(new ObjectDeathParameter());
+            }
             SubscribeToMessages();
         }
 
@@ -68,6 +74,11 @@ namespace CauldronOnlineServer.Services.Traits
             }
         }
 
+        private bool CanTakeDamage()
+        {
+            return _combatVitals.Health > 0;
+        }
+
         private void SubscribeToMessages()
         {
             _parent.SubscribeWithFilter<TakeDamageMessage>(TakeDamage, _id);
@@ -77,19 +88,25 @@ namespace CauldronOnlineServer.Services.Traits
             _parent.SubscribeWithFilter<FullHealMessage>(FullHeal, _id);
             _parent.SubscribeWithFilter<SetCombatStatsMessage>(SetCombatStats, _id);
             _parent.SubscribeWithFilter<ApplyCombatStatsMessage>(ApplyCombatStats, _id);
+            _parent.SubscribeWithFilter<RestoreManaMessage>(RestoreMana, _id);
+            _parent.SubscribeWithFilter<RemoveManaMessage>(RemoveMana, _id);
         }
 
         private void TakeDamage(TakeDamageMessage msg)
         {
-            if (_parent.State == WorldObjectState.Active && _combatVitals.Health > 0)
+            if (CanTakeDamage())
             {
                 _combatVitals.Health -= msg.Amount;
                 _parameter.Vitals = _combatVitals;
+                _parent.RefreshParameters();
                 if (_combatVitals.Health <= 0)
                 {
                     this.SendMessageTo(new ObjectDeathMessage{OwnerId = _parent.Data.Id}, _parent);
                 }
-                _parent.RefreshParameters();
+                else
+                {
+                    this.SendMessageTo(new DamageTakenMessage{Amount = msg.Amount}, _parent);
+                }
             }
 
         }
@@ -121,7 +138,7 @@ namespace CauldronOnlineServer.Services.Traits
                     zone.EventManager.RegisterEvent(new HealEvent { Amount = msg.Amount, OwnerId = msg.OwnerId, TargetId = _parent.ZoneId});
                 }
             }
-            _parent.AddParameter(_parameter);
+            _parent.RefreshParameters();
 
         }
 
@@ -174,6 +191,45 @@ namespace CauldronOnlineServer.Services.Traits
             _parameter.Vitals = _combatVitals;
             _parent.RefreshParameters();
 
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
+            {
+                zone.EventManager.RegisterEvent(new UpdateCombatStatsEvent
+                {
+                    Stats = _parameter.Stats,
+                    Secondary = _bonusSecondary,
+                    Vitals = _combatVitals,
+                    OwnerId = _parent.Data.Id
+                });
+            }
+        }
+
+        private void RestoreMana(RestoreManaMessage msg)
+        {
+            var allStats = _baseStats + _bonusStats;
+            _combatVitals.Mana = Math.Max(0, Math.Min(allStats.Mana, _combatVitals.Mana + msg.Amount));
+            _parameter.Vitals = _combatVitals;
+            _parent.RefreshParameters();
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
+            {
+                zone.EventManager.RegisterEvent(new UpdateCombatStatsEvent
+                {
+                    Stats = _parameter.Stats,
+                    Secondary = _parameter.BonusSecondary,
+                    Vitals = _parameter.Vitals,
+                    OwnerId = _parent.Data.Id
+                });
+            }
+
+        }
+
+        private void RemoveMana(RemoveManaMessage msg)
+        {
+            var allStats = _baseStats + _bonusStats;
+            _combatVitals.Mana = Math.Max(0, Math.Min(allStats.Mana, _combatVitals.Mana - msg.Amount));
+            _parameter.Vitals = _combatVitals;
+            _parent.RefreshParameters();
             var zone = ZoneService.GetZoneById(_parent.ZoneId);
             if (zone != null)
             {

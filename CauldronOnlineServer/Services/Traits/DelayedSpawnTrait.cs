@@ -43,7 +43,7 @@ namespace CauldronOnlineServer.Services.Traits
             var zone = ZoneService.GetZoneById(_parent.ZoneId);
             if (zone != null)
             {
-                zone.ObjectManager.RequestObject(_spawnData.Spawn.DisplayName, _spawnData.Spawn.Traits, _spawnData.Spawn.ShowNameOnClient, _spawnData.Spawn.Parameters, _parent.Data.Position, _spawnData.Spawn.IsMonster, ObjectSpawned, _spawnData.Spawn.ShowOnClient, true, _spawnData.ShowAppearance, _spawnData.StartActive);
+                zone.ObjectManager.RequestObject(_spawnData.Spawn.DisplayName, _spawnData.Spawn.Traits, _spawnData.Spawn.ShowNameOnClient, _spawnData.Spawn.Parameters, _parent.Data.Position, _spawnData.Spawn.IsMonster, ObjectSpawned, _spawnData.Spawn.ShowOnClient, true, _spawnData.ShowAppearance, _spawnData.StartActive, _spawnData.Spawn.MinimapIcon);
             }
         }
 

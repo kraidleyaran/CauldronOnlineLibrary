@@ -46,6 +46,10 @@ namespace CauldronOnlineServer.Services.Traits
                 foreach (var trait in traits)
                 {
                     _parent.AddTrait(trait, _parent);
+                    if (!trait.Instant)
+                    {
+                        _applied.Add(trait);
+                    }
                 }
 
                 this.SendMessageTo(new ApplyCombatStatsMessage { Stats = _bonusStatsPerPlayer, Bonus = true }, _parent);

@@ -38,7 +38,7 @@ namespace CauldronOnlineServer.Services.Traits
             var zone = ZoneService.GetZoneById(_parent.ZoneId);
             if (zone != null)
             {
-                zone.EventManager.RegisterEvent(new MovementEvent { Id = _parent.Data.Id, Position = msg.Position, Tick = msg.Tick, Speed = msg.Speed }, true);
+                zone.EventManager.RegisterEvent(new MovementEvent { Id = _parent.Data.Id, Position = msg.Position, Direction = msg.Direction, Tick = msg.Tick, Speed = msg.Speed }, true);
             }
         }
 

@@ -47,7 +47,7 @@ namespace CauldronOnlineServer.Services.Traits
             var zone = ZoneService.GetZoneById(_parent.ZoneId);
             if (zone != null)
             {
-                _spawnableTiles = zone.GetTilesInSquareArea(_parent.Tile, _spawnArea);
+                _spawnableTiles = _spawnArea > 0 ? zone.GetTilesInSquareArea(_parent.Tile, _spawnArea) : new[]{_parent.Tile};
             }
 
             if (_initialSpawn)
@@ -87,7 +87,7 @@ namespace CauldronOnlineServer.Services.Traits
                     if (zone != null)
                     {
                         var tile = _spawnableTiles.Length > 1 ? _spawnableTiles[RNGService.Range(0, _spawnableTiles.Length)] : _spawnableTiles[0];
-                        zone.ObjectManager.RequestObject(_spawnData.DisplayName, _spawnData.Traits, _spawnData.ShowNameOnClient, _spawnData.Parameters, tile.WorldPosition, _spawnData.IsMonster, OnUnitSpawned, _spawnData.ShowOnClient, true, _spawnData.ShowAppearance, _spawnData.StartActive);
+                        zone.ObjectManager.RequestObject(_spawnData.DisplayName, _spawnData.Traits, _spawnData.ShowNameOnClient, _spawnData.Parameters, tile.WorldPosition, _spawnData.IsMonster, OnUnitSpawned, _spawnData.ShowOnClient, true, _spawnData.ShowAppearance, _spawnData.StartActive, _spawnData.MinimapIcon);
                     }
                 }
             }

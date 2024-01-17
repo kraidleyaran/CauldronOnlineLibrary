@@ -12,9 +12,11 @@ namespace CauldronOnlineCommon.Data.Combat
         public float PhysicalCritPerAgility;
         public float MagicalDamagePerWisdom;
         public float ManaReductionPerWisdom;
+        public float MagicalHealPerWisdom;
         public float CriticalStrikePerLuck;
         public float MagicalCritPerWisdom;
         public float ItemQuantityBonusPerLuck;
+        public float OnChanceBonusPerLuck;
         public float PhysicalDefensePerArmor;
         public float MagicalDefensePerArmor;
         public float DamagePerDefense;
@@ -23,6 +25,10 @@ namespace CauldronOnlineCommon.Data.Combat
         public float DamageAggro;
         public float CriticalStrikeDamagePercent;
         public int GlobalReApplyTicks;
+        public float ExperiencePerPlayerMultiplier;
+        public float ItemQuantityPerPlayerMultiplier;
+        public int DeathGoldPerLevel;
+        public float DeathGoldPercentPerArmorValue;
 
         public int CalculateDamageResist(DamageType type, CombatStats stats)
         {
@@ -86,6 +92,11 @@ namespace CauldronOnlineCommon.Data.Combat
             return (int) System.Math.Round(amount * CriticalStrikeDamagePercent);
         }
 
+        public float CalculateOnChanceBonus(int luck)
+        {
+            return luck * OnChanceBonusPerLuck;
+        }
+
         public int AggroPerPovCheck(int value = 1)
         {
             return (int)System.Math.Round(value * OutOfPovAggro);
@@ -99,6 +110,16 @@ namespace CauldronOnlineCommon.Data.Combat
         public int AggroPerDamage(int value = 1)
         {
             return (int) System.Math.Round(value * DamageAggro);
+        }
+
+        public int CalculateDeathFeeForLevel(int level)
+        {
+            return DeathGoldPerLevel * (level + 1);
+        }
+
+        public int CalculateDeathFreeForArmorValue(int value)
+        {
+            return (int) System.Math.Round(value * DeathGoldPercentPerArmorValue);
         }
     }
 }

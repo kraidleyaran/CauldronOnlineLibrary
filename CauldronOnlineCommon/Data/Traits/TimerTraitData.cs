@@ -10,8 +10,10 @@ namespace CauldronOnlineCommon.Data.Traits
 
         public string[] ApplyOnStart;
         public string[] ApplyOnLoop;
+        public string[] ApplyOnEnd;
         public int TotalTicks;
         public int TotalLoops;
         public bool ShowOnClient;
+        
     }
 }

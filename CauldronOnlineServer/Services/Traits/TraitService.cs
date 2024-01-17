@@ -138,6 +138,28 @@ namespace CauldronOnlineServer.Services.Traits
                     return new MonsterScalingTrait(data);
                 case ApplyCombatStatsTraitData.TYPE:
                     return new ApplyCombatStatsTrait(data);
+                case TilemapTraitData.TYPE:
+                    return new TilemapTrait(data);
+                case CullableTraitData.TYPE:
+                    return new CullableTrait(data);
+                case TeleportTraitData.TYPE:
+                    return new TeleportTrait(data);
+                case TeleportAroundTargetTraitData.TYPE:
+                    return new TeleportAroundTargetTrait(data);
+                case VisualFxTraitData.TYPE:
+                    return new VisualFxTrait(data);
+                case ActivateTriggerEventsTraitData.TYPE:
+                    return new ActivateTriggerEventsTrait(data);
+                case WorldQuestTraitData.TYPE:
+                    return new WorldQuestTrait(data);
+                case StaticTeleportTraitData.TYPE:
+                    return new StaticTeleportTrait(data);
+                case RestoreManaTraitData.TYPE:
+                    return new RestoreManaTrait(data);
+                case OnDamageTakenTraitData.TYPE:
+                    return new OnDamageTakenTrait(data);
+                case BossTraitData.TYPE:
+                    return new BossTrait(data);
                 default:
                     return new WorldTrait(data);
             }

@@ -27,6 +27,10 @@ namespace CauldronOnlineServer.Services.Quests
             {
                 case EliminateQuestObjectiveData.TYPE:
                     return new EliminateObjective(data);
+                case WaveQuestObjectiveData.TYPE:
+                    return new WaveObjective(data);
+                case SwitchSignalQuestObjectiveData.TYPE:
+                    return new SwitchSignalObjective(data);
                 default:
                     return new QuestObjective(data);
             }

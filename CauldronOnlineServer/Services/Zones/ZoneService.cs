@@ -94,12 +94,27 @@ namespace CauldronOnlineServer.Services.Zones
             if (_instance._reverseLookup.TryGetValue(zone, out var worldZone))
             {
                 DefaultZone = worldZone;
-                _instance.Log($"Default zone set to {worldZone.Name} - {worldZone.Id} - {worldZone.DefaultSpawn}");
+                _instance.Log($"Default zone set to {worldZone.Data.Name} - {worldZone.Id} - {worldZone.DefaultSpawn}");
             }
             else
             {
                 _instance.Log($"Unable to Set Default Zone - {zone} not found", LogType.Warning);
             }
+        }
+
+        public static void ResetZone(string zoneName)
+        {
+            if (!_instance._zones.TryGetValue(zoneName, out var zone))
+            {
+                if (!_instance._reverseLookup.TryGetValue(zoneName, out zone))
+                {
+                    return;
+                }
+            }
+            
+            zone.Reset();
+            var id = _instance.GenerateId();
+            zone.Startup(id);
         }
 
         private void GenerateZones()
@@ -122,7 +137,8 @@ namespace CauldronOnlineServer.Services.Zones
                     if (result.Success)
                     {
                         var id = GenerateId();
-                        var zone = new WorldZone(result.Data, id);
+                        var zone = new WorldZone(result.Data);
+                        zone.Startup(id);
                         _zones.Add(id, zone);
                         _reverseLookup.Add(result.Data.Name, zone);
                         foreach (var alias in result.Data.Aliases)
@@ -133,7 +149,7 @@ namespace CauldronOnlineServer.Services.Zones
                             }
                             else
                             {
-                                Log($"Duplicate alias detected for zone {zone.Name} - Alias: {alias}", LogType.Warning);
+                                Log($"Duplicate alias detected for zone {zone.Data.Name} - Alias: {alias}", LogType.Warning);
                             }
                         }
                         Log($"Zone generated for {result.Data.Name} - {zone.Id}");

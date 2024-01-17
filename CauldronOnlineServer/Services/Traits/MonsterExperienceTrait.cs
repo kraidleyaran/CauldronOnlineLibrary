@@ -35,10 +35,11 @@ namespace CauldronOnlineServer.Services.Traits
             if (zone != null)
             {
                 var players = zone.ObjectManager.GetPlayersInZone();
+                
                 if (players.Length > 0)
                 {
                     var experience = RNGService.Range(_experience.Min, _experience.Max + 1);
-                    var clientExperienceMsg = new ClientExperienceMessage { Amount = experience, OriginId = _parent.Data.Id};
+                    var clientExperienceMsg = new ClientExperienceMessage { Amount = experience, OriginId = _parent.Data.Id, Players = players.Length};
                     var applyExperienceMsg = new ApplyExperienceMessage {Message = clientExperienceMsg.ToByteArray()};
                     foreach (var player in players)
                     {

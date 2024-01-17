@@ -38,5 +38,11 @@ namespace CauldronOnlineServer.Services.Zones.Managers
         {
             _eventQueue.Enqueue(msg.Event);
         }
+
+        public override void Destroy()
+        {
+            _eventQueue = new ConcurrentQueue<string>();
+            base.Destroy();
+        }
     }
 }

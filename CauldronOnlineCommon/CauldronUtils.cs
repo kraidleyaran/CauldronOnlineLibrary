@@ -120,6 +120,23 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<ClientProjectileReturnedMessage>(json, _settings);
                 case ClientUpdateCombatStatsMessage.ID:
                     return JsonConvert.DeserializeObject<ClientUpdateCombatStatsMessage>(json, _settings);
+                case ClientQuestInteractionRequestMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientQuestInteractionRequestMessage>(json, _settings);
+                case ClientQuestInteractionResultMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientQuestInteractionResultMessage>(json, _settings);
+                case ClientDropItemMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientDropItemMessage>(json, _settings);
+                case ClientClaimItemRequestMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientClaimItemRequestMessage>(json, _settings);
+                case ClientClaimItemResultMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientClaimItemResultMessage>(json, _settings);
+                case ClientPlayerRosterRemoveMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientPlayerRosterRemoveMessage>(json, _settings);
+                case ClientResetZoneRequestMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientResetZoneRequestMessage>(json, _settings);
+                case ClientResetZoneResultMessage.ID:
+                    return JsonConvert.DeserializeObject<ClientResetZoneResultMessage>(json, _settings);
+
             }
         }
 
@@ -185,6 +202,14 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<ReturnToOwnerEvent>(json, _settings);
                 case HasReturnedToOwnerEvent.ID:
                     return JsonConvert.DeserializeObject<HasReturnedToOwnerEvent>(json, _settings);
+                case VisualFxEvent.ID:
+                    return JsonConvert.DeserializeObject<VisualFxEvent>(json, _settings);
+                case WorldQuestUpdateEvent.ID:
+                    return JsonConvert.DeserializeObject<WorldQuestUpdateEvent>(json, _settings);
+                case PlayerDroppedItemEvent.ID:
+                    return JsonConvert.DeserializeObject<PlayerDroppedItemEvent>(json, _settings);
+                case PlayerClaimItemEvent.ID:
+                    return JsonConvert.DeserializeObject<PlayerClaimItemEvent>(json, _settings);
                 default:
                     return original;
             }
@@ -248,6 +273,20 @@ namespace CauldronOnlineCommon
                     return JsonConvert.DeserializeObject<ProjectileRedirectParameter>(json, _settings);
                 case BombableDoorParameter.TYPE:
                     return JsonConvert.DeserializeObject<BombableDoorParameter>(json, _settings);
+                case StashParameter.TYPE:
+                    return JsonConvert.DeserializeObject<StashParameter>(json, _settings);
+                case TilemapParameter.TYPE:
+                    return JsonConvert.DeserializeObject<TilemapParameter>(json, _settings);
+                case CullableParameter.TYPE:
+                    return JsonConvert.DeserializeObject<CullableParameter>(json, _settings);
+                case WorldQuestParameter.TYPE:
+                    return JsonConvert.DeserializeObject<WorldQuestParameter>(json, _settings);
+                case BossParameter.TYPE:
+                    return JsonConvert.DeserializeObject<BossParameter>(json, _settings);
+                case DroppedItemParameter.TYPE:
+                    return JsonConvert.DeserializeObject<DroppedItemParameter>(json, _settings);
+                case ZoneResetInteractionParameter.TYPE:
+                    return JsonConvert.DeserializeObject<ZoneResetInteractionParameter>(json, _settings);
                 default:
                     return original;
             }

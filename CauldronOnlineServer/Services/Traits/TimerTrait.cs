@@ -10,6 +10,7 @@ namespace CauldronOnlineServer.Services.Traits
     {
         private string[] _applyOnStart;
         private string[] _applyOnLoop;
+        private string[] _applyOnEnd = new string[0];
         private int _totalTicks;
         private int _totalLoops;
         private bool _showOnClient = false;
@@ -24,6 +25,7 @@ namespace CauldronOnlineServer.Services.Traits
             {
                 _applyOnStart = timerData.ApplyOnStart;
                 _applyOnLoop = timerData.ApplyOnLoop;
+                _applyOnEnd = timerData.ApplyOnEnd;
                 _totalTicks = timerData.TotalTicks;
                 _totalLoops = timerData.TotalLoops;
                 _showOnClient = timerData.ShowOnClient;
@@ -80,6 +82,19 @@ namespace CauldronOnlineServer.Services.Traits
 
         private void TimerComplete()
         {
+            if (_applyOnEnd.Length > 0)
+            {
+                var traits = TraitService.GetWorldTraits(_applyOnEnd);
+                foreach (var trait in traits)
+                {
+                    _parent.AddTrait(trait);
+                }
+            }
+
+            foreach (var trait in _applied)
+            {
+                _parent.RemoveTrait(trait);
+            }
             _timer.Destroy();
             _timer = null;
             _parent.RemoveTrait(this);

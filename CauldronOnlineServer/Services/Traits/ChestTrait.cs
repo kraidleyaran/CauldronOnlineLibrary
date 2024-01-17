@@ -33,7 +33,7 @@ namespace CauldronOnlineServer.Services.Traits
             SubscribeToMessages();
         }
 
-        protected internal void SubscribeToMessages()
+        protected internal virtual void SubscribeToMessages()
         {
             _parent.SubscribeWithFilter<OpenChestMessage>(OpenChest, _id);
         }

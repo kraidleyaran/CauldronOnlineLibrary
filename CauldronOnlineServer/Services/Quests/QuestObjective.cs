@@ -30,5 +30,10 @@ namespace CauldronOnlineServer.Services.Quests
         {
             return new WorldObject[0];
         }
+
+        public virtual void Reset()
+        {
+            CurrentAmount = 0;
+        }
     }
 }

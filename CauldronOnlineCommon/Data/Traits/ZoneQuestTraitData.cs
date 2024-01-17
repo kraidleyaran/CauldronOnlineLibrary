@@ -15,8 +15,11 @@ namespace CauldronOnlineCommon.Data.Traits
         public bool UsePov;
         public string[] ApplyOnComplete;
         public string[] TriggerEventsOnComplete;
+        public int CompletionDelay;
+        public string[] TriggerEventsOnReset;
         public bool ResetQuest;
         public WorldIntRange ResetTicks;
         public string SpawnEvent;
+        public WorldVector2Int[] IgnoreTiles = new WorldVector2Int[0];
     }
 }

@@ -132,6 +132,7 @@ namespace CauldronOnlineServer.Services.Traits
                     if (zone != null)
                     {
                         var wanderTiles = _anchor ? zone.GetTilesInPovArea(_anchorTile, _wanderRange) : zone.GetTilesInPovArea(_parent.Tile, _wanderRange);
+                        wanderTiles = wanderTiles.Where(t => !t.Blocked).ToArray();
                         if (Array.IndexOf(wanderTiles, _parent.Tile) >= 0)
                         {
                             var tiles = wanderTiles.ToList();

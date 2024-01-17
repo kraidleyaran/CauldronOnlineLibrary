@@ -13,5 +13,6 @@ namespace CauldronOnlineCommon.Data.Traits
         public WorldVector2Int Direction;
         public string[] Tags;
         public HitboxData Hitbox;
+        public string ProjectileDirectionIcon;
     }
 }

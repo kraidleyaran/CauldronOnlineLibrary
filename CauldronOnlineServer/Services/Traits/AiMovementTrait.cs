@@ -66,7 +66,7 @@ namespace CauldronOnlineServer.Services.Traits
 
         private void ZoneUpdateTick(ZoneUpdateTickMessage msg)
         {
-            if (_aiState != AiState.OutOfBounds && _parent.State == WorldObjectState.Active && _currentPath.Count > 0 && !_knockbackActive)
+            if (_aiState != AiState.OutOfBounds && _parent.State == WorldObjectState.Active && _currentPath.Count > 0 && !_knockbackActive && _moveSpeed > 0)
             {
                 var moveTo = _currentPath[0];
                 var moveSpeed = _moveSpeed + _bonusSpeed;
@@ -77,13 +77,13 @@ namespace CauldronOnlineServer.Services.Traits
                     if (zone != null)
                     {
                         _parent.SetPosition(moveToPos);
-                        zone.EventManager.RegisterEvent(new MovementEvent { Id = _parent.Data.Id, Position = moveToPos, Speed = moveSpeed });
+                        zone.EventManager.RegisterEvent(new MovementEvent { Id = _parent.Data.Id, Position = moveToPos, Speed = moveSpeed, Direction = _direction});
                         if (!zone.IsValidPosition(moveToPos))
                         {
                             if (_aiState != AiState.OutOfBounds)
                             {
                                 this.SendMessageTo(new SetAiStateMessage { State = AiState.OutOfBounds }, _parent);
-                                var tile = zone.FindClosestTile(_parent.Tile, moveToPos);
+                                var tile = zone.FindClosesTileByWorldPosition(moveToPos, _parent.Tile, _parent.Tile.Position.Distance(moveToPos));
                                 if (tile != null)
                                 {
                                     _currentPath.Clear();
@@ -103,7 +103,7 @@ namespace CauldronOnlineServer.Services.Traits
                     var zone = ZoneService.GetZoneById(_parent.ZoneId);
                     if (zone != null)
                     {
-                        zone.EventManager.RegisterEvent(new MovementEvent { Id = _parent.Data.Id, Position = moveTo.WorldPosition, Speed = moveSpeed });
+                        zone.EventManager.RegisterEvent(new MovementEvent { Id = _parent.Data.Id, Position = moveTo.WorldPosition, Speed = moveSpeed, Direction = _direction});
                     }
                 }
             }
@@ -113,9 +113,10 @@ namespace CauldronOnlineServer.Services.Traits
                 if (zone != null)
                 {
                     var moveSpeed = _moveSpeed + _bonusSpeed;
-                    var moveToPos = _parent.Data.Position + _parent.Data.Position.Direction(_parent.Tile.Position) * moveSpeed;
+                    var direction = _parent.Data.Position.Direction(_parent.Tile.WorldPosition);
+                    var moveToPos = _parent.Data.Position + direction * moveSpeed;
                     _parent.SetPosition(moveToPos);
-                    zone.EventManager.RegisterEvent(new MovementEvent{Position = moveToPos, Speed = moveSpeed, Id = _parent.Data.Id});
+                    zone.EventManager.RegisterEvent(new MovementEvent{Position = moveToPos, Speed = moveSpeed, Direction = direction, Id = _parent.Data.Id});
                     var tile = zone.GetTileByWorldPosition(_parent.Data.Position);
                     if (tile != null)
                     {

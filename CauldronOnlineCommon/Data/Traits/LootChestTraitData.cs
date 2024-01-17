@@ -20,6 +20,8 @@ namespace CauldronOnlineCommon.Data.Traits
         public WorldIntRange RefillTicks;
         public bool DestroyAfterOpen;
         public int DestroyTicks;
+        public string[] ResetOnEvents = new string[0];
+        public bool DestroyOnReset;
 
     }
 }

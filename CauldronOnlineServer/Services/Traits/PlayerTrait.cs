@@ -56,14 +56,21 @@ namespace CauldronOnlineServer.Services.Traits
 
         private void OnZoneTransferComplete(string objId, string playerName, string zone, WorldVector2Int pos)
         {
-            WorldServer.SendToClient(new ClientZoneTransferResultMessage{Success = true, ObjectId = objId, Zone = zone, Position = pos}, _connectionId);
-            this.UnsubscribeFromAllMessagesWithFilter(_worldId);
-            var currentZone = ZoneService.GetZoneById(_parent.ZoneId);
-            PlayerService.UpdatePlayerPosition(_worldId, zone, pos);
-            if (currentZone != null)
+            if (string.IsNullOrEmpty(objId))
             {
-                currentZone.EventManager.RegisterEvent(new DestroyObjectEvent{ObjectId = _parent.Data.Id, OwnerId = _parent.Data.Id});
-                currentZone.ObjectManager.RequestDestroyObject(_parent.Data.Id, _worldId);
+                WorldServer.SendToClient(new ClientZoneTransferResultMessage { Success = false, Message = "Failed to load zone"}, _connectionId);
+            }
+            else
+            {
+                WorldServer.SendToClient(new ClientZoneTransferResultMessage { Success = true, ObjectId = objId, Zone = zone, Position = pos }, _connectionId);
+                this.UnsubscribeFromAllMessagesWithFilter(_worldId);
+                var currentZone = ZoneService.GetZoneById(_parent.ZoneId);
+                PlayerService.UpdatePlayerPosition(_worldId, zone, pos);
+                if (currentZone != null)
+                {
+                    currentZone.EventManager.RegisterEvent(new DestroyObjectEvent { ObjectId = _parent.Data.Id, OwnerId = _parent.Data.Id });
+                    currentZone.ObjectManager.RequestDestroyObject(_parent.Data.Id, _worldId);
+                }
             }
         }
 
@@ -84,6 +91,7 @@ namespace CauldronOnlineServer.Services.Traits
         private void SubscribeToMessages()
         {
             this.SubscribeWithFilter<ZoneUpdateTickMessage>(ZoneUpdateTick, _parent.ZoneId);
+            //this.SubscribeWithFilter<ZoneResolveTickMessage>(ZoneResolveTick, _parent.ZoneId);
             this.SubscribeWithFilter<PlayerWorldEventsUpdateMessage>(PlayerWorldEventsUpdate, _parent.ZoneId);
 
             this.SubscribeWithFilter<ClientObjectRequestMessage>(ClientObjectRequest, _worldId);
@@ -113,9 +121,15 @@ namespace CauldronOnlineServer.Services.Traits
             this.SubscribeWithFilter<ClientReturnToOwnerMessage>(ClientReturnToOwner, _worldId);
             this.SubscribeWithFilter<ClientProjectileReturnedMessage>(ClientProjectileReturned, _worldId);
             this.SubscribeWithFilter<ClientUpdateCombatStatsMessage>(ClientUpdateCombatStats, _worldId);
+            this.SubscribeWithFilter<ClientQuestInteractionRequestMessage>(ClientQuestInteractionRequest, _worldId);
+            this.SubscribeWithFilter<ClientDropItemMessage>(ClientDroppedItem, _worldId);
+            this.SubscribeWithFilter<ClientClaimItemRequestMessage>(ClientClaimItemRequest, _worldId);
+            this.SubscribeWithFilter<ClientExplorePositionsMessage>(ClientExplorePositions, _worldId);
+            this.SubscribeWithFilter<ClientResetZoneRequestMessage>(ClientZoneResetRequest, _worldId);
             
             _parent.SubscribeWithFilter<ApplyExperienceMessage>(ApplyExperience, _id);
             _parent.SubscribeWithFilter<UpdatePositionMessage>(UpdatePosition, _id);
+            _parent.SubscribeWithFilter<ClientClaimItemResultMessage>(ClientClaimItemResult, _id);
         }
 
         private void PlayerWorldEventsUpdate(PlayerWorldEventsUpdateMessage msg)
@@ -158,7 +172,7 @@ namespace CauldronOnlineServer.Services.Traits
                     if (_updateRegistry)
                     {
                         _updateRegistry = false;
-                        PlayerService.UpdatePlayerPosition(_worldId, zone.Name, _parent.Data.Position);
+                        PlayerService.UpdatePlayerPosition(_worldId, zone.Data.Name, _parent.Data.Position);
                     }
                 }
             }
@@ -191,7 +205,8 @@ namespace CauldronOnlineServer.Services.Traits
                     }
                     SystemEventService.SendMessage($"{_parent.Data.DisplayName} has left the world", SystemEventType.Leave);
                     zone.EventManager.RegisterEvent(new DestroyObjectEvent { ObjectId = _parent.Data.Id, OwnerId = _parent.Data.Id });
-                    zone.ObjectManager.RequestDestroyObject(_parent.Data.Id, _worldId);   
+                    zone.ObjectManager.RequestDestroyObject(_parent.Data.Id, _worldId);
+                    this.SendMessageWithFilter(PlayerLeftWorldMessage.INSTANCE, ZoneService.GLOBAL_ZONE_FILTER);
                 }
             }   
         }
@@ -311,7 +326,7 @@ namespace CauldronOnlineServer.Services.Traits
                     else if (zone.IsValidPosition(msg.Position))
                     {
                         zone.EventManager.RegisterEvent(new TeleportEvent{Position = msg.Position, Tick = msg.Tick, ObjectId = _parent.Data.Id}, true);
-                        WorldServer.SendToClient(new ClientZoneTransferResultMessage { Success = true, Zone = zone.Name, Position = msg.Position, ObjectId = _parent.Data.Id}, _connectionId);
+                        WorldServer.SendToClient(new ClientZoneTransferResultMessage { Success = true, Zone = zone.Data.Name, Position = msg.Position, ObjectId = _parent.Data.Id}, _connectionId);
                     }
                     else
                     {
@@ -332,14 +347,14 @@ namespace CauldronOnlineServer.Services.Traits
             if (toZone != null && fromZone != null)
             {
                 var pos = msg.Position;
-                if (!toZone.IsValidPosition(pos))
-                {
-                    pos = toZone.DefaultSpawn;
-                }
+                //if (!toZone.IsValidPosition(pos))
+                //{
+                //    pos = toZone.DefaultSpawn;
+                //}
                 if (toZone == fromZone)
                 {
                     toZone.EventManager.RegisterEvent(new RespawnEvent{OwnerId = _parent.Data.Id, Position = pos});
-                    WorldServer.SendToClient(new ClientRespawnResultMessage{Zone = toZone.Name, Position = pos, Success = true,}, _connectionId);
+                    WorldServer.SendToClient(new ClientRespawnResultMessage{Zone = toZone.Data.Name, Position = pos, Success = true,}, _connectionId);
                 }
                 else
                 {
@@ -414,7 +429,7 @@ namespace CauldronOnlineServer.Services.Traits
             var zone = ZoneService.GetZoneById(_parent.ZoneId);
             if (zone != null)
             {
-                zone.EventManager.RegisterEvent(new ChestOpenEvent{TargetId = msg.TargetId, Tick = msg.Tick}, true);
+                zone.EventManager.RegisterEvent(new ChestOpenEvent{TargetId = msg.TargetId, Tick = msg.Tick, PlayerName = _parent.Data.DisplayName}, true);
             }
         }
 
@@ -439,7 +454,7 @@ namespace CauldronOnlineServer.Services.Traits
         private void ClientTeleport(ClientTeleportMessage msg)
         {
             var zone = ZoneService.GetZoneById(_parent.ZoneId);
-            if (zone != null && zone.IsValidPosition(msg.Position))
+            if (zone != null)
             {
                 zone.EventManager.RegisterEvent(new TeleportEvent{ObjectId = _parent.Data.Id, Position = msg.Position, Tick = msg.Tick});
             }
@@ -521,7 +536,27 @@ namespace CauldronOnlineServer.Services.Traits
             var zone = ZoneService.GetZoneById(_parent.ZoneId);
             if (zone != null)
             {
-                zone.EventManager.RegisterEvent(new UpdateCombatStatsEvent{OwnerId = _parent.Data.Id, Stats = msg.Stats, Secondary = msg.Secondary, Vitals = msg.Vitals}, true);
+                zone.EventManager.RegisterEvent(
+                    new UpdateCombatStatsEvent
+                    {
+                        OwnerId = _parent.Data.Id,
+                        Stats = msg.Stats,
+                        Secondary = msg.Secondary,
+                        Vitals = msg.Vitals,
+                        Tick = msg.Tick
+                    }, true);
+            }
+        }
+
+        private void ClientQuestInteractionRequest(ClientQuestInteractionRequestMessage msg)
+        {
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
+            {
+                if (zone.ObjectManager.TryGetObjectById(msg.ObjectId, out var questObj))
+                {
+                    this.SendMessageTo(new PlayerQuestInteractionMessage{ConnectionId = _connectionId}, questObj);
+                }
             }
         }
 
@@ -538,7 +573,63 @@ namespace CauldronOnlineServer.Services.Traits
             //}
         }
 
-        
+        private void ClientDroppedItem(ClientDropItemMessage msg)
+        {
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
+            {
+                zone.EventManager.RegisterEvent(new PlayerDroppedItemEvent{Item = msg.Item, Stack = msg.Stack, Position = msg.Position, Tick = msg.Tick}, true);
+            }
+        }
+
+        private void ClientClaimItemRequest(ClientClaimItemRequestMessage msg)
+        {
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null && zone.ObjectManager.DoesObjectExist(msg.ObjectId))
+            {
+                zone.EventManager.RegisterEvent(new PlayerClaimItemEvent{OwnerId = _parent.Data.Id, ObjectId = msg.ObjectId, Tick = msg.Tick}, true);
+            }
+        }
+
+        private void ClientClaimItemResult(ClientClaimItemResultMessage msg)
+        {
+            WorldServer.SendToClient(msg, _connectionId);
+        }
+
+        private void ClientExplorePositions(ClientExplorePositionsMessage msg)
+        {
+            //var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            //if (zone != null)
+            //{
+            //    zone.Minimap.AddPositionRequest(msg.Positions);
+            //}
+        }
+
+        private void ZoneResolveTick(ZoneResolveTickMessage msg)
+        {
+            _updateRegistry = false;
+        }
+
+        private void ClientZoneResetRequest(ClientResetZoneRequestMessage msg)
+        {
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
+            {
+                if (zone.ObjectManager.TryGetObjectById(msg.ObjectId, out var obj))
+                {
+                    this.SendMessageTo(new ZoneResetRequestMessage{ConnectionId = _connectionId}, obj);
+                }
+                else
+                {
+                    WorldServer.SendToClient(new ClientResetZoneResultMessage{Success = false, Message = "Invalid object"}, _connectionId);
+                }
+            }
+            else
+            {
+                WorldServer.SendToClient(new ClientResetZoneResultMessage { Success = false, Message = "Invalid zone" }, _connectionId);
+            }
+        }
+            
 
         public override void Destroy()
         {

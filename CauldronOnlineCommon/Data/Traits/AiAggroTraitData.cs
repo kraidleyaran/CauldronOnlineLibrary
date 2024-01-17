@@ -15,5 +15,6 @@ namespace CauldronOnlineCommon.Data.Traits
         public float DiagonalCost = 0f;
         public AggroType AggroType;
         public bool HealOnAggroLoss;
+        public bool AlwaysAggrod;
     }
 }

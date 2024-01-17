@@ -41,6 +41,7 @@ namespace CauldronOnlineServer.Services.Traits
             _parent.SubscribeWithFilter<SetSwitchSignalMessage>(SetSwitchSignal, _filter);
             _parent.SubscribeWithFilter<SetSwitchLockStateMessage>(SetSwitchLockState, _filter);
             _parent.SubscribeWithFilter<AdvanceSwitchSignalMessage>(AdvanceSwitchSignal, _filter);
+            this.SubscribeWithFilter<UpdateSignalMessage>(UpdateSignal, _filter);
         }
 
         private void SetSwitchSignal(SetSwitchSignalMessage msg)
@@ -91,6 +92,17 @@ namespace CauldronOnlineServer.Services.Traits
                 zone.EventManager.RegisterEvent(new SwitchSignalEvent { TargetId = _parent.Data.Id, Signal = _parameter.CurrentSignal, Locked = _parameter.Locked });
             }
             this.SendMessageWithFilter(new UpdateSignalMessage { Signal = _parameter.CurrentSignal, SwitchName = _parameter.Name }, _filter);
+        }
+
+        private void UpdateSignal(UpdateSignalMessage msg)
+        {
+            if (_parameter.CurrentSignal != msg.Signal)
+            {
+                _parameter.CurrentSignal = msg.Signal;
+                _parent.RefreshParameters();
+                var zone = ZoneService.GetZoneById(_parent.ZoneId);
+                zone?.EventManager.RegisterEvent(new SwitchSignalEvent { TargetId = _parent.Data.Id, Signal = _parameter.CurrentSignal, Locked = _parameter.Locked });
+            }
         }
 
         public override void Destroy()

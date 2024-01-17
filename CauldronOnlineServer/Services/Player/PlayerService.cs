@@ -12,6 +12,8 @@ namespace CauldronOnlineServer.Services.Player
     {
         public const string NAME = "Player";
 
+        public static int PlayerCount => _instance._players.Count;
+
         private static PlayerService _instance = null;
 
         private ConcurrentDictionary<string, RegisteredPlayerData> _players = new ConcurrentDictionary<string, RegisteredPlayerData>();
@@ -35,14 +37,19 @@ namespace CauldronOnlineServer.Services.Player
             else
             {
                 var id = GenerateId();
-                _instance._players.TryAdd(clientId, new RegisteredPlayerData { PlayerId = id });
+                _instance._players.TryAdd(clientId, new RegisteredPlayerData { PlayerId = id, Zone = string.Empty});
+                WorldServer.SendToAllClients(new ClientPlayerRosterUpdateMessage { Player = _instance._players[clientId] });
                 return id;
             }
         }
 
         public static void UnregisterPlayer(string clientId)
         {
-            _instance._players.TryRemove(clientId, out var data);
+            if (_instance._players.TryRemove(clientId, out var data) && data != null)
+            {
+                WorldServer.SendToAllClients(new ClientPlayerRosterRemoveMessage { PlayerId = data.PlayerId });
+            }
+            
         }
 
         public static void UpdatePlayer(string clientId, string displayName, SpriteColorData spriteColor)

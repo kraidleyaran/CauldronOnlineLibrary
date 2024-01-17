@@ -168,6 +168,7 @@ namespace CauldronOnlineServer
         {
             if (ClientService.HasConnectionId(connectionId))
             {
+                clientMsg.Sender = null;
                 var data = clientMsg.ToByteArray();
                 if (data.Length > _instance._server.MaxMessageSize)
                 {

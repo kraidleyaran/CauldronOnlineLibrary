@@ -22,7 +22,7 @@ namespace CauldronOnlineServer.Services.Traits
         public override void Setup(WorldObject parent, object sender)
         {
             base.Setup(parent, sender);
-            _parent.AddParameter(_parameter);
+            _parent.AddParameter(_parameter, Name);
         }
     }
 }

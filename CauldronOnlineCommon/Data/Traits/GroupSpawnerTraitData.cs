@@ -13,5 +13,7 @@ namespace CauldronOnlineCommon.Data.Traits
         public float ChanceToSpawn;
         public float BonusPerMissedChance;
         public ZoneSpawnData[] Objects;
+        public bool ApplyStateToChildren;
+        public string[] AdditionalTraits = new string[0];
     }
 }

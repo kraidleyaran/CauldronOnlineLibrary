@@ -25,6 +25,7 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public override string Type => TYPE;
 
         public int AggroRange { get; set; }
+        public bool AlwaysAggrod { get; set; }
     }
 
     [Serializable]
@@ -38,6 +39,7 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public SecondaryStats BonusSecondary { get; set; }
         public CombatVitals Vitals { get; set; }
         public bool Monster { get; set; }
+        public bool IsBoss { get; set; }
     }
 
     [Serializable]
@@ -142,8 +144,10 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public HitboxData Hitbox { get; set; }
         public float Rotation { get; set; }
         public string[] TriggerEvents { get; set; }
+        public RequiredSwitchSignalData[] Signals { get; set; }
         public bool RequireAllEvents { get; set; }
         public bool AllowOpenWithNoItems { get; set; }
+        public bool ApplyTrapSpawn { get; set; }
         public WorldVector2Int TrappedSpawnPosition { get; set; }
         
     }
@@ -182,6 +186,8 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public int SpawnEvery { get; set; }
         public float ChanceToSpawn { get; set; }
         public float BonusOnMissedChance { get; set; }
+        public bool ApplyStateToChildren { get; set; }
+        public string[] AdditionalTraits { get; set; }
     }
 
     [Serializable]
@@ -200,6 +206,8 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public WorldIntRange RefillTicks { get; set; }
         public bool DestroyAfterOpen { get; set; }
         public int DestroyTicks { get; set; }
+        public string[] ResetOnEvents { get; set; }
+        public bool DestroyOnReset { get; set; }
     }
 
     [Serializable]
@@ -229,9 +237,14 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public bool UsePov { get; set; }
         public string[] ApplyOnComplete { get; set; }
         public string[] TriggerEventOnComplete { get; set; }
+        public int CompletionDelay { get; set; }
         public bool ResetQuest { get; set; }
+        public string[] TriggerEventOnReset { get; set; }
         public WorldIntRange ResetTicks { get; set; }
         public string SpawnEvent { get; set; }
+        public WorldVector2Int[] IgnoreTiles { get; set; }
+        
+        
     }
 
     [Serializable]
@@ -335,7 +348,9 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public WorldVector2Int Direction { get; set; }
         public HitboxData Hitbox { get; set; }
         public string[] Tags { get; set; }
+        public string ProjectileDirectionIcon { get; set; }
         public override string Type => TYPE;
+
     }
 
     [Serializable]
@@ -347,6 +362,77 @@ namespace CauldronOnlineCommon.Data.ObjectParameters
         public bool Open { get; set; }
         public int BombingExperience { get; set; }
         public override string Type => TYPE;
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class StashParameter : ObjectParameter
+    {
+        public const string TYPE = "Stash";
+        public HitboxData Hitbox { get; set; }
+        public override string Type => TYPE;
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class TilemapParameter : ObjectParameter
+    {
+        public const string TYPE = "Tilemap";
+        public string Tilemap { get; set; }
+        public override string Type => TYPE;
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class CullableParameter : ObjectParameter
+    {
+        public const string TYPE = "Cullable";
+        public override string Type => TYPE;
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class WorldQuestParameter : ObjectParameter
+    {
+        public const string TYPE = "WorldQuest";
+        public override string Type => TYPE;
+        public string QuestName { get; set; }
+        public string[] StartingDialogue { get; set; }
+        public string[] InProgressDialogue { get; set; }
+        public string[] CompletedDialogue { get; set; }
+        public QuestState State { get; set; }
+        public HitboxData Hitbox { get; set; }
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class BossParameter : ObjectParameter
+    {
+        public const string TYPE = "Boss";
+        public override string Type => TYPE;
+        public string DisplayName { get; set; }
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class DroppedItemParameter : ObjectParameter
+    {
+        public const string TYPE = "DroppedItem";
+        public override string Type => TYPE;
+        public string Item { get; set; }
+        public int Stack { get; set; }
+        public string ItemId { get; set; }
+    }
+
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class ZoneResetInteractionParameter : ObjectParameter
+    {
+        public const string TYPE = "ZoneResetInteraction";
+        public override string Type => TYPE;
+        public WorldItemStackData[] RequiredItems { get; set; }
+        public HitboxData Hitbox { get; set; }
+        public string Zone { get; set; }
     }
 
 }

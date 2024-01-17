@@ -2,6 +2,7 @@
 using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.Items;
 using CauldronOnlineCommon.Data.Math;
+using CauldronOnlineCommon.Data.Quests;
 using Newtonsoft.Json;
 
 namespace CauldronOnlineCommon.Data.WorldEvents
@@ -35,6 +36,7 @@ namespace CauldronOnlineCommon.Data.WorldEvents
         public string Id { get; set; }
         public int Speed { get; set; }
         public WorldVector2Int Position { get; set; }
+        public WorldVector2Int Direction { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptOut)]
@@ -135,6 +137,7 @@ namespace CauldronOnlineCommon.Data.WorldEvents
         public LootTableData LootTable { get; set; }
         public WorldIntRange Drops { get; set; }
         public bool IsMonster { get; set; }
+        public int Players { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptOut)]
@@ -346,5 +349,61 @@ namespace CauldronOnlineCommon.Data.WorldEvents
     {
         public const int ID = 30;
         public override int EventId => ID;
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class VisualFxEvent : WorldEvent
+    {
+        public const int ID = 31;
+        public override int EventId => ID;
+
+        public string Name { get; set; }
+        public WorldVector2Int Position { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class WorldQuestUpdateEvent : WorldEvent
+    {
+        public const int ID = 32;
+        public override int EventId => ID;
+
+        public string ObjectId { get; set; }
+        public QuestState State { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class PlayerDroppedItemEvent : WorldEvent
+    {
+        public const int ID = 33;
+        public override int EventId => ID;
+
+        public string Item { get; set; }
+        public int Stack { get; set; }
+        public WorldVector2Int Position { get; set; }
+        public string ObjectId { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class PlayerClaimItemEvent : WorldEvent
+    {
+        public const int ID = 34;
+        public override int EventId => ID;
+
+        public string OwnerId { get; set; }
+        public string ObjectId { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class MinimapExplorationUpdateEvent : WorldEvent
+    {
+        public const int ID = 35;
+        public override int EventId => ID;
+
+        public WorldVector2Int[] Positions { get; set; }
     }
 }

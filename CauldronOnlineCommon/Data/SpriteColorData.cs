@@ -11,5 +11,7 @@ namespace CauldronOnlineCommon.Data
         public string Eyes { get; set; }
         public string PrimaryShirt { get; set; }
         public string SecondaryShirt { get; set; }
+        public string Pants { get; set; }
+        public string Shoes { get; set; }
     }
 }

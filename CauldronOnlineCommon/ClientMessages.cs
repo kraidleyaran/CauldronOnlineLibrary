@@ -3,6 +3,7 @@ using CauldronOnlineCommon.Data;
 using CauldronOnlineCommon.Data.Combat;
 using CauldronOnlineCommon.Data.Items;
 using CauldronOnlineCommon.Data.Math;
+using CauldronOnlineCommon.Data.Quests;
 using CauldronOnlineCommon.Data.WorldEvents;
 using ConcurrentMessageBus;
 using Newtonsoft.Json;
@@ -90,6 +91,7 @@ namespace CauldronOnlineCommon
         public const int ID = 7;
         public override int MessageId => ID;
         public WorldVector2Int Position { get; set; }
+        public WorldVector2Int Direction { get; set; }
         public int Speed { get; set; }
         public WorldTick Tick { get; set; }
     }
@@ -286,6 +288,7 @@ namespace CauldronOnlineCommon
         public const int ID = 25;
         public override int MessageId => ID;
         public int Amount { get; set; }
+        public int Players { get; set; }
         public string OriginId { get; set; }
     }
 
@@ -501,4 +504,91 @@ namespace CauldronOnlineCommon
         public WorldTick Tick { get; set; }
     }
 
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientQuestInteractionRequestMessage : ClientMessage
+    {
+        public const int ID = 46;
+        public override int MessageId => ID;
+        public string ObjectId { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientQuestInteractionResultMessage : ClientMessage
+    {
+        public const int ID = 47;
+        public override int MessageId => ID;
+        public QuestState State { get; set; }
+        public string ObjectId { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientDropItemMessage : ClientMessage
+    {
+        public const int ID = 48;
+        public override int MessageId => ID;
+        public string Item { get; set; }
+        public int Stack { get; set; }
+        public WorldVector2Int Position { get; set; }
+        public WorldTick Tick { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientClaimItemRequestMessage : ClientMessage
+    {
+        public const int ID = 49;
+        public override int MessageId => ID;
+        public string ObjectId { get; set; }
+        public WorldTick Tick { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientClaimItemResultMessage : ClientMessage
+    {
+        public const int ID = 50;
+        public override int MessageId => ID;
+        public bool Success { get; set; }
+        public string ObjectId { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientExplorePositionsMessage : ClientMessage
+    {
+        public const int ID = 51;
+        public override int MessageId => ID;
+        public WorldVector2Int[] Positions { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientPlayerRosterRemoveMessage : ClientMessage
+    {
+        public const int ID = 52;
+        public override int MessageId => ID;
+        public string PlayerId { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientResetZoneRequestMessage : ClientMessage
+    {
+        public const int ID = 53;
+        public override int MessageId => ID;
+        public string ObjectId { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
+    public class ClientResetZoneResultMessage : ClientMessage
+    {
+        public const int ID = 54;
+        public override int MessageId => ID;
+        public bool Success { get; set; }
+        public string Message { get; set; }
+    }
 }

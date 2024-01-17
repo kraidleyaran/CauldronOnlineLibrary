@@ -18,8 +18,9 @@ namespace CauldronOnlineServer.Requests
         public bool ShowName;
         public bool ShowAppearance;
         public bool StartActive;
+        public string MinimapIcon;
 
-        public CreateObjectRequest(string displayName, string[] traits, bool showName, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient, bool showAppearance, bool startActive)
+        public CreateObjectRequest(string displayName, string[] traits, bool showName, ObjectParameter[] parameters, WorldVector2Int position, bool isMonster, Action<WorldObject> doAfter, bool showOnClient, bool showAppearance, bool startActive, string minimapIcon)
         {
             DisplayName = displayName;
             Traits = traits;
@@ -31,6 +32,7 @@ namespace CauldronOnlineServer.Requests
             ShowName = showName;
             ShowAppearance = showAppearance;
             StartActive = startActive;
+            MinimapIcon = minimapIcon;
         }
     }
 }

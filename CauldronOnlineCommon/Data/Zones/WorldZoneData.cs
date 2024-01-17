@@ -15,5 +15,6 @@ namespace CauldronOnlineCommon.Data.Zones
         public ZoneSpawnData[] Spawns = new ZoneSpawnData[0];
         public WorldVector2Int Offset = WorldVector2Int.Zero;
         public WorldVector2Int DefaultSpawn = WorldVector2Int.Zero;
+        public string[] ResetEvents = new string[0];
     }
 }

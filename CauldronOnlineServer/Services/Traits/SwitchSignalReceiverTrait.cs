@@ -36,22 +36,26 @@ namespace CauldronOnlineServer.Services.Traits
 
         private void UpdateSignal(UpdateSignalMessage msg)
         {
-            var data = _onSignal.FirstOrDefault(d => d.Switch == msg.SwitchName);
-            if (data != null && data.Signal == msg.Signal)
+            var onSignal = _onSignal.Where(d => d.Switch == msg.SwitchName && d.Signal == msg.Signal).ToArray();
+            if (onSignal.Length > 0)
             {
-                var traits = TraitService.GetWorldTraits(data.ApplyOnSignal);
-                foreach (var trait in traits)
+                foreach (var data in onSignal)
                 {
-                    _parent.AddTrait(trait);
-                }
-
-                if (data.ApplyEventsOnSignal.Length > 0)
-                {
-                    foreach (var triggerEvent in data.ApplyEventsOnSignal)
+                    var traits = TraitService.GetWorldTraits(data.ApplyOnSignal);
+                    foreach (var trait in traits)
                     {
-                        TriggerEventService.TriggerEvent(triggerEvent);
+                        _parent.AddTrait(trait);
+                    }
+
+                    if (data.ApplyEventsOnSignal.Length > 0)
+                    {
+                        foreach (var triggerEvent in data.ApplyEventsOnSignal)
+                        {
+                            TriggerEventService.TriggerEvent(triggerEvent);
+                        }
                     }
                 }
+
 
             }
         }

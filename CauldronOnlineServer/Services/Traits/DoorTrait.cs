@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CauldronOnlineCommon.Data.ObjectParameters;
+using CauldronOnlineCommon.Data.Switches;
 using CauldronOnlineCommon.Data.Traits;
 using CauldronOnlineCommon.Data.WorldEvents;
 using CauldronOnlineServer.Services.Items;
@@ -31,7 +32,10 @@ namespace CauldronOnlineServer.Services.Traits
                 _doorParameter.Rotation = door.Rotation;
                 _doorParameter.TriggerEvents = door.TriggerEvents;
                 _doorParameter.AllowOpenWithNoItems = door.AllowOpenWithNoItems;
+                _doorParameter.ApplyTrapSpawn = door.ApplyTrapSpawn;
                 _doorParameter.TrappedSpawnPosition = door.TrappedSpawnPosition;
+                _doorParameter.Signals = door.Signals;
+                _doorParameter.RequireAllEvents = door.RequireAllTriggerEvents;
             }
         }
 
@@ -47,6 +51,29 @@ namespace CauldronOnlineServer.Services.Traits
             SubscribeToMessages();
         }
 
+        private void ToggleDoor(bool registerEvent)
+        {
+            _doorParameter.Open = !_doorParameter.Open;
+            _parent.RefreshParameters();
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
+            {
+                if (_doorParameter.Open)
+                {
+                    zone.RemoveBlockedTile(_parent.Tile.Position, _parent);
+                }
+                else
+                {
+                    zone.SetBlockedTile(_parent.Tile.Position, _parent);
+                }
+
+                if (registerEvent)
+                {
+                    zone.EventManager.RegisterEvent(new DoorEvent { Open = _doorParameter.Open, OwnerId = _parent.Data.Id, TargetId = _parent.Data.Id });
+                }
+            }
+        }
+
         private void SubscribeToMessages()
         {
             _parent.SubscribeWithFilter<SetDoorStateMessage>(SetDoorState, _id);
@@ -58,26 +85,35 @@ namespace CauldronOnlineServer.Services.Traits
                     this.SubscribeWithFilter<ZoneEventTriggerMessage>(msg => ZoneEventTrigger(msg, triggerEvent), TriggerEventService.GetFilter(_parent.ZoneId, triggerEvent));
                 }
             }
+
+            if (_doorParameter.Signals.Length > 0)
+            {
+                foreach (var signal in _doorParameter.Signals)
+                {
+                    this.SubscribeWithFilter<UpdateSignalMessage>(msg => UpdateSignal(msg, signal), SwitchTrait.GenerateFilter(signal.Switch, _parent.ZoneId));
+                }
+            }
         }
 
         private void SetDoorState(SetDoorStateMessage msg)
         {
             _doorParameter.Open = msg.Open;
             _parent.RefreshParameters();
-            if (!msg.IsEvent)
+            var zone = ZoneService.GetZoneById(_parent.ZoneId);
+            if (zone != null)
             {
-                var zone = ZoneService.GetZoneById(_parent.ZoneId);
-                if (zone != null)
+                if (_doorParameter.Open)
                 {
-                    if (_doorParameter.Open)
-                    {
-                        zone.RemoveBlockedTile(_parent.Tile.Position, _parent);
-                    }
-                    else
-                    {
-                        zone.SetBlockedTile(_parent.Tile.Position, _parent);
-                    }
-                    zone.EventManager.RegisterEvent(new DoorEvent{Open = _doorParameter.Open, OwnerId = _parent.Data.Id, TargetId = _parent.Data.Id});
+                    zone.RemoveBlockedTile(_parent.Tile.Position, _parent);
+                }
+                else
+                {
+                    zone.SetBlockedTile(_parent.Tile.Position, _parent);
+                }
+
+                if (!msg.IsEvent)
+                {
+                    zone.EventManager.RegisterEvent(new DoorEvent { Open = _doorParameter.Open, OwnerId = _parent.Data.Id, TargetId = _parent.Data.Id });
                 }
             }
         }
@@ -91,23 +127,17 @@ namespace CauldronOnlineServer.Services.Traits
 
             if (!_doorParameter.RequireAllEvents || _triggeredEvents.Count == _doorParameter.TriggerEvents.Length)
             {
-                _doorParameter.Open = !_doorParameter.Open;
-                _parent.RefreshParameters();
-                var zone = ZoneService.GetZoneById(_parent.ZoneId);
-                if (zone != null)
-                {
-                    if (_doorParameter.Open)
-                    {
-                        zone.RemoveBlockedTile(_parent.Tile.Position, _parent);
-                    }
-                    else
-                    {
-                        zone.SetBlockedTile(_parent.Tile.Position, _parent);
-                    }
-                    zone.EventManager.RegisterEvent(new DoorEvent { Open = _doorParameter.Open, OwnerId = _parent.Data.Id, TargetId = _parent.Data.Id });
-                }
+                ToggleDoor(true);
             }
 
+        }
+
+        private void UpdateSignal(UpdateSignalMessage msg, RequiredSwitchSignalData required)
+        {
+            if (required.Signal == msg.Signal)
+            {
+                ToggleDoor(true);
+            }
         }
 
         private void DoorCheck(DoorCheckMessage msg)

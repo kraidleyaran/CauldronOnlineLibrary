@@ -8,20 +8,20 @@ namespace CauldronOnlineServer.Services.Traits
 {
     public class HitboxTrait : WorldTrait
     {
-        private ApplyHitboxData[] _hitboxes = new ApplyHitboxData[0];
+        private HitboxParameter _parameter = new HitboxParameter();
 
         public HitboxTrait(WorldTraitData data) : base(data)
         {
             if (data is HitboxTraitData hitbox)
             {
-                _hitboxes = hitbox.Hitboxes.ToArray();
+                _parameter.Hitboxes = hitbox.Hitboxes;
             }
         }
 
         public override void Setup(WorldObject parent, object sender)
         {
             base.Setup(parent, sender);
-            _parent.AddParameter(new HitboxParameter{Hitboxes = _hitboxes});
+            _parent.AddParameter(_parameter, Name);
         }
 
         public override void Destroy()
